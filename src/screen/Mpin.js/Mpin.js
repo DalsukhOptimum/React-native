@@ -1,27 +1,59 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text,SafeAreaView,TextInput,Pressable,AsyncStorage } from 'react-native'
+//  import {AsyncStorage} from '@react-native-async-storage/async-storage'
+import React, {useState} from 'react';
 import {styles} from './Style';
+import Loder from '../../component/Loder';
 
 
-submit = () =>{
-    fetch('api/PINOperation/GeneratePin', {
+
+// submit = () => {
+//   console.log("Hello")
+// }
+const Mpin = ({route,navigation}) => {
+  const [loader, setloader] = useState(false);
+  const [pin, setpin] = useState('');
+
+
+      const  Email = route.params.Email  ;
+      console.log("This is Verify pin dataL: ",Email)
+
+
+      LoginPgae = () => {
+        navigation.navigate('Home',);
+      }
+
+       submit  =  () =>{
+    fetch('http://localhost:3446/api/PINOperation/VerifyPin', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({Email: Email, Pin:password}),
+        body: JSON.stringify({Official_EmaildID: Email, Pin:pin}),
       })
         .then(resp => resp.json())
-        .then(json => {
-          if(json?.status == "Error"){
-              alert(json?.message)
+        .then(async json => {
+          if(json?.Code == "400" || json?.Code == "500"){
+              alert(json?.Message)
           }
-          if(json?.Code == 1){
-            navigation.navigate('Webview', {Data: json});
+          if(json?.Code == "200"){
+           
+            try{
+              await  AsyncStorage.setItem('@Data',JSON.stringify(json.ArrayOfResponse[0]));
+              
+            }
+            catch(error)
+            {
+              console.log("error aaya ",error);
+            }
+            alert(json?.Message)
+            navigation.navigate('Webview', {Data: json.ArrayOfResponse[0]});
+          
+       
+          
           }
           else{
-            alert(json?.message);
+            alert(json?.Message);
           }
   
           console.log(json);
@@ -35,11 +67,13 @@ submit = () =>{
    
 }
 
-const Mpin = ({route,navigation}) => {
-    const [password, setPassword] = useState('');
-    const {Email} = route.params
 
-    console.log(Email);
+
+ 
+    // const {Data} = route.params.Data
+
+    // console.log(Email);
+    console.log("Data: ",route.params.Data );
   return (
     <SafeAreaView style={styles.container}>
     <Loder Start={loader}/>
@@ -50,8 +84,8 @@ const Mpin = ({route,navigation}) => {
       style={[styles.input,{marginTop: 10}]}
       placeholder="PIN"
       secureTextEntry
-      value={password}
-      onChangeText={setPassword}
+      value={pin}
+      onChangeText={setpin}
       autoCorrect={false}
       autoCapitalize="none"
     />
@@ -61,6 +95,9 @@ const Mpin = ({route,navigation}) => {
     <Pressable style={styles.button} onPress={() => submit()}>
       <Text style={styles.buttonText}>LOGIN</Text>
     </Pressable>
+    <Text style={styles.footerText}>
+       Forget Pin?<Text onPress={() => LoginPgae()}  style={styles.signup}> Set Up Pin</Text>
+    </Text>
   </View>
 
 

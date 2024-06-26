@@ -5,8 +5,10 @@ import {
   Image,
   TextInput,
   Pressable,
+  AsyncStorage,
 } from 'react-native';
-import React, {useState} from 'react';
+// import {AsyncStorage} from '@react-native-async-storage/async-storage'
+import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
 
@@ -19,10 +21,31 @@ const Home = ({navigation}) => {
     navigation.navigate('Webview', {id: 'asasasas'});
   };
 
+  useEffect(() => {
+    // retrieveData = async () => {
+    ( async () => {
+      try {
+        const value = await AsyncStorage.getItem('@Data');
+        console.log("i am printing the values: ",value)
+        if (value !== null) {
+          console.log('i am redirecting');
+          let data = await JSON.parse(value);
+         console.log('this is last ', data);
+          navigation.navigate('Mpin', {
+            Email:data.Official_EmaildID,
+          });
+        }
+      } catch (error) {
+     console.log("i am in catch block ",error)
+      }
+    } ) ()
+    return
+  }, []);
+
   function submit() {
     setloader(true);
     console.log(username, password);
-    fetch('http://10.0.2.2:3000/api/Login/LoginHrms', {
+    fetch('http://localhost:3446/api/Login/LoginHrms', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -36,17 +59,18 @@ const Home = ({navigation}) => {
           alert(json?.message);
         }
         if (json?.status == 'success') {
-          alert(json?.message);
-          if (json?.Pin != null) {
+          if (json?.ArrayOfResponse[0].PinStatus != null) {
             navigation.navigate('Mpin', {
-              Data: json.ArryOfResponse[o].Official_EmilId,
+              Email: json.ArrayOfResponse[0].Official_EmaildID,
             });
           } else {
-            navigation.navigate('Mpin', {
-              Data: json.ArryOfResponse[o].Official_EmilId,
-            });
-            navigation.navigate('Mpin', {
-              Data: json.ArryOfResponse[o].Official_EmilId,
+            console.log(
+              'From Home component: ',
+              json.ArrayOfResponse[0].Official_EmaildID,
+            );
+            navigation.navigate('SetPin', {
+              Employee_Code: json.ArrayOfResponse[0].Employee_Code,
+              Email: json.ArrayOfResponse[0].Official_EmaildID,
             });
           }
         }
@@ -58,7 +82,9 @@ const Home = ({navigation}) => {
         setloader(true);
         console.error(error);
       })
-      .finally(() => {});
+      .finally(() => {
+        setloader(false);
+      });
   }
 
   return (
@@ -84,17 +110,7 @@ const Home = ({navigation}) => {
           autoCapitalize="none"
         />
       </View>
-      <View style={styles.rememberView}>
-        {/* <View style={styles.switch}>
-              <Switch  value={click} onValueChange={setClick} trackColor={{true : "green" , false : "gray"}} />
-              <Text style={styles.rememberText}>Remember Me</Text>
-          </View> */}
-        <View>
-          <Pressable onPress={() => Alert.alert('Forget Password!')}>
-            <Text style={styles.forgetText}>Forgot Pin?</Text>
-          </Pressable>
-        </View>
-      </View>
+      <View style={styles.rememberView}></View>
 
       <View style={styles.buttonView}>
         <Pressable style={styles.button} onPress={() => submit()}>
@@ -102,9 +118,7 @@ const Home = ({navigation}) => {
         </Pressable>
       </View>
 
-      <Text style={styles.footerText}>
-        Don't Haven't set the Pin?<Text style={styles.signup}> Set Up Pin</Text>
-      </Text>
+     
     </SafeAreaView>
   );
 };

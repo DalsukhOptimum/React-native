@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems : "center",
         // paddingTop: 70,
-        backgroundColor: 'pink'
+        backgroundColor: '#93D3D7'
       },
       image : {
         height : 160,
@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
         textTransform : "uppercase",
         textAlign: "center",
         paddingVertical : 40,
-        color : "red"
+        color : "black"
       },
       inputView : {
         gap : 15,
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
       input : {
         height : 50,
         paddingHorizontal : 20,
-        borderColor : "red",
+        borderColor : "black",
         borderWidth : 1,
         borderRadius: 7,
         color: '#000'
@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
         color : "red"
       },
       button : {
-        backgroundColor : "red",
+        backgroundColor : "blue",
         height : 45,
         borderColor : "gray",
         borderWidth  : 1,

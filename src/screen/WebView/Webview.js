@@ -15,12 +15,16 @@ import {
   import {useRef, useState, useEffect} from 'react';
 
   const Webview = ({route,navigation}) => {
-  const {data} = route.params ;
+  const ResponseData = route.params.Data ;
+  console.log("this is before stringify ",ResponseData)
+  const FinalData =JSON.stringify(ResponseData)
+  console.log("stringified Data: ", FinalData);
     const webView = useRef(null);
     const [NavUrl, setNavUrl] = useState();
     const [cameraPermission, setCameraPermission] = useState(false);
     const [MobileNo, setMobileNo] = useState(null);
     const [interNetConnection, setinterNetConnection] = useState(false);
+ 
   
      
     const INJECTED_JAVASCRIPT = `
@@ -90,11 +94,12 @@ import {
     </View>
   );
     
-   let Base_Url='http://ekyam.optimumfintech.co.in/login'
+   let Base_Url="https://localhost:4200/login/React?Data="+FinalData
 
     return (
       <>
         <SafeAreaView style={{flex: 1}}>
+      
         <WebView
           allowFileAccess
           ref={webView}

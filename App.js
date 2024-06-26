@@ -11,10 +11,12 @@ import {
   Text,
   useColorScheme,
   View,
+  AsyncStorage
 } from 'react-native';
 import Home from './src/screen/Home.js/Home';
 import Mpin from './src/screen/Mpin.js/Mpin';
 import Webview from './src/screen/WebView/Webview';
+import SetPin from './src/screen/SetPin/SetPin';
 
 const stack = createStackNavigator();
 
@@ -27,6 +29,7 @@ const  App = ()=> {
     <stack.Screen name="Home" component={Home}   options={{headerShown: false}}/>
     <stack.Screen name="Mpin" component={Mpin} />
     <stack.Screen name="Webview" component={Webview} />
+    <stack.Screen name="SetPin" component={SetPin} />
     {/* <stack.Screen name="Another" component={Another} /> */}
     </stack.Navigator>
   </NavigationContainer>
