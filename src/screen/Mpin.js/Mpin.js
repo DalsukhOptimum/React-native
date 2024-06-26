@@ -7,7 +7,7 @@ import {
   AsyncStorage,
 } from 'react-native';
 //  import {AsyncStorage} from '@react-native-async-storage/async-storage'
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
 
@@ -17,8 +17,35 @@ import Loder from '../../component/Loder';
 const Mpin = ({route, navigation}) => {
   const [loader, setloader] = useState(false);
   const [pin, setpin] = useState('');
+  const [Email, setEmail] = useState('');
 
-  const Email = route.params.Email;
+
+  useEffect(() => {
+    // retrieveData = async () => {
+    (async () => {
+      try {
+       const  value = await AsyncStorage.getItem('@Data');
+        console.log('i am printing the values: ', value);
+        if (value !== null) {
+        
+          let data = await JSON.parse(value);
+          console.log("this is final data object: ",data)
+          setEmail(data.Official_EmaildID);
+        
+          console.log("this is Email ",Email)
+
+         
+        }
+      } 
+      catch (error) {
+        console.log('i am in catch block ', error);
+      }
+    })();
+    return;
+  }, []);
+
+
+ 
   console.log('This is Verify pin dataL: ', Email);
 
   LoginPgae = () => {
@@ -67,7 +94,7 @@ const Mpin = ({route, navigation}) => {
   // const {Data} = route.params.Data
 
   // console.log(Email);
-  console.log('Data: ', route.params.Data);
+  // console.log('Data: ', route.params.Data);
   return (
     <SafeAreaView style={styles.container}>
       <Loder Start={loader} />

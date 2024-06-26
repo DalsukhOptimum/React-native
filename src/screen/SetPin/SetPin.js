@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView,TextInput,Pressable } from 'react-native'
+import { View, Text, SafeAreaView,TextInput,Pressable, AsyncStorage } from 'react-native'
 import React, {useState} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
@@ -26,16 +26,26 @@ export default function SetPin({route,navigation}) {
             body: JSON.stringify({Employee_Code: Employee_Code, Pin: pin}),
           })
             .then(resp => resp.json())
-            .then(json => {
+            .then(async json => {
               if (json?.Code == '400' || json?.Code == '500' ) {
                 alert(json?.Message);
               }
               if (json?.Code == '200') {
+
+                try {
+                  AsyncStorage.clear();
+                  console.log("this is data ",JSON.stringify(json.ArrayOfResponse[0]))
+                  await AsyncStorage.setItem(
+                    '@Data',
+                    JSON.stringify(json.ArrayOfResponse[0]),
+                  );
+                } catch (error) {
+                  console.log('error aaya ', error);
+                }
+
                 alert(json?.Message);
 
-                navigation.navigate('Mpin', {
-                    Email: Email,
-                  });
+                navigation.navigate('Mpin');
               
               }
       

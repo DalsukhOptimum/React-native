@@ -79,13 +79,17 @@ const Home = ({navigation}) => {
           }
 
           if (json?.ArrayOfResponse[0].PinStatus != null && value == null) {
-            navigation.navigate('Mpin', {
-              Email: json.ArrayOfResponse[0].Official_EmaildID,
-            });
+            navigation.navigate('Mpin');
           } else if (
             json?.ArrayOfResponse[0].PinStatus != null &&
             value != null
           ) {
+            navigation.navigate('SetPin', {
+              Employee_Code: json.ArrayOfResponse[0].Employee_Code,
+              Email: json.ArrayOfResponse[0].Official_EmaildID,
+            });
+          }
+          else{
             navigation.navigate('SetPin', {
               Employee_Code: json.ArrayOfResponse[0].Employee_Code,
               Email: json.ArrayOfResponse[0].Official_EmaildID,
