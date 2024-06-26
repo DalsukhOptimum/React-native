@@ -63,7 +63,9 @@ export const styles = StyleSheet.create({
         borderWidth  : 1,
         borderRadius : 5,
         alignItems : "center",
-        justifyContent : "center"
+        justifyContent : "center",
+        width:270,
+        marginTop:10
       },
       buttonText : {
         color : "white"  ,
@@ -72,7 +74,7 @@ export const styles = StyleSheet.create({
       }, 
       buttonView :{
         width :"100%",
-        paddingHorizontal : 50
+        paddingHorizontal : 45
       },
       optionsText : {
         textAlign : "center",
@@ -95,6 +97,8 @@ export const styles = StyleSheet.create({
       footerText : {
         textAlign: "center",
         color : "gray",
+        marginTop:10,
+        fontSize:15
       },
       signup : {
         color : "red",

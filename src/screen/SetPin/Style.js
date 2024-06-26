@@ -63,7 +63,8 @@ export const styles = StyleSheet.create({
         borderWidth  : 1,
         borderRadius : 5,
         alignItems : "center",
-        justifyContent : "center"
+        justifyContent : "center",
+        marginTop:10
       },
       buttonText : {
         color : "white"  ,

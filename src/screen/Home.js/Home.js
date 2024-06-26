@@ -11,38 +11,49 @@ import {
 import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
+import {Dropdown} from 'react-native-element-dropdown';
 
 const Home = ({navigation}) => {
-  const [click, setClick] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loader, setloader] = useState(false);
-  const submiaat = () => {
-    navigation.navigate('Webview', {id: 'asasasas'});
-  };
+  const [Role, setRole] = useState(0);
+  const [isFocus, setIsFocus] = useState(false);
+
+  const data = [
+    {label: 'Employee', value: '0'},
+    {label: 'Admin', value: '1'},
+  ];
 
   useEffect(() => {
     // retrieveData = async () => {
-    ( async () => {
+    (async () => {
       try {
         const value = await AsyncStorage.getItem('@Data');
-        console.log("i am printing the values: ",value)
+        console.log('i am printing the values: ', value);
         if (value !== null) {
           console.log('i am redirecting');
           let data = await JSON.parse(value);
-         console.log('this is last ', data);
+          console.log('this is last ', data);
           navigation.navigate('Mpin', {
-            Email:data.Official_EmaildID,
+            Email: data.Official_EmaildID,
           });
         }
       } catch (error) {
-     console.log("i am in catch block ",error)
+        console.log('i am in catch block ', error);
       }
-    } ) ()
-    return
+    })();
+    return;
   }, []);
 
   function submit() {
+
+    // let EmailRegex ="^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$" ;
+    if(username == "")
+      {
+        alert("Please enter Valid Email");
+        return ;
+      }
     setloader(true);
     console.log(username, password);
     fetch('http://localhost:3446/api/Login/LoginHrms', {
@@ -51,23 +62,30 @@ const Home = ({navigation}) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({role: 0, username: username, password: password}),
+      body: JSON.stringify({role:Role , username: username, password: password}),
     })
       .then(resp => resp.json())
-      .then(json => {
+      .then(async json => {
+        let value;
         if (json?.status == 'Error') {
           alert(json?.message);
         }
         if (json?.status == 'success') {
-          if (json?.ArrayOfResponse[0].PinStatus != null) {
+          try {
+            value = await AsyncStorage.getItem('@Data');
+            console.log('i am printing the values: ', value);
+          } catch (error) {
+            console.log('i am in catch block ', error);
+          }
+
+          if (json?.ArrayOfResponse[0].PinStatus != null && value == null) {
             navigation.navigate('Mpin', {
               Email: json.ArrayOfResponse[0].Official_EmaildID,
             });
-          } else {
-            console.log(
-              'From Home component: ',
-              json.ArrayOfResponse[0].Official_EmaildID,
-            );
+          } else if (
+            json?.ArrayOfResponse[0].PinStatus != null &&
+            value != null
+          ) {
             navigation.navigate('SetPin', {
               Employee_Code: json.ArrayOfResponse[0].Employee_Code,
               Email: json.ArrayOfResponse[0].Official_EmaildID,
@@ -79,10 +97,12 @@ const Home = ({navigation}) => {
         setloader(false);
       })
       .catch(error => {
-        setloader(true);
+        setloader(false);
         console.error(error);
       })
       .finally(() => {
+        setPassword("");
+        setUsername("");
         setloader(false);
       });
   }
@@ -90,7 +110,33 @@ const Home = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Loder Start={loader} />
+
+
       <Text style={styles.title}>HRMS</Text>
+
+      <Dropdown
+        style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={data}
+        search
+        maxHeight={300}
+        labelField="label"
+        valueField="Role"
+        placeholder={!isFocus ? (Role == 0)?'Employee':'Admin' : '...'}
+        searchPlaceholder="Search..."
+        value={Role}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={item => {
+          setRole(item.value);
+          setIsFocus(false);
+        }}
+      />
+
+
       <View style={styles.inputView}>
         <TextInput
           style={styles.input}
@@ -117,8 +163,6 @@ const Home = ({navigation}) => {
           <Text style={styles.buttonText}>LOGIN</Text>
         </Pressable>
       </View>
-
-     
     </SafeAreaView>
   );
 };

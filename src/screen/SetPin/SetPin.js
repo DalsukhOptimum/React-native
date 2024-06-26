@@ -74,7 +74,7 @@ export default function SetPin({route,navigation}) {
 
   <View style={styles.buttonView}>
     <Pressable style={styles.button} onPress={() => submit()}>
-      <Text style={styles.buttonText}>LOGIN</Text>
+      <Text style={styles.buttonText}>SUBMIT</Text>
     </Pressable>
   </View> 
 

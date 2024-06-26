@@ -94,8 +94,8 @@ import {
     </View>
   );
     
-   let Base_Url="https://localhost:4200/login/React?Data="+FinalData
-
+   let Base_Url=`https://localhost:4200/login/React?Data=${encodeURIComponent(FinalData)}`
+   console.log("final link ",Base_Url)
     return (
       <>
         <SafeAreaView style={{flex: 1}}>

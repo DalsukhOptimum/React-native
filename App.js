@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React,{useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack'
 import {NavigationContainer} from '@react-navigation/native'
 
@@ -23,6 +23,28 @@ const stack = createStackNavigator();
 
 const  App = ()=> {
 
+
+  useEffect(() => {
+
+    (async () => {
+      try {
+        const value = await AsyncStorage.getItem('@Data');
+        console.log('i am printing the values: ', value);
+        if (value !== null) {
+          console.log('i am redirecting');
+          let data = await JSON.parse(value);
+          console.log('this is last ', data);
+          navigation.navigate('Mpin', {
+            Email: data.Official_EmaildID,
+          });
+        }
+      } catch (error) {
+        console.log('i am in catch block ', error);
+      }
+    })();
+    return;
+  }, []);
+
   return (
   <NavigationContainer>
     <stack.Navigator>
@@ -30,7 +52,6 @@ const  App = ()=> {
     <stack.Screen name="Mpin" component={Mpin} />
     <stack.Screen name="Webview" component={Webview} />
     <stack.Screen name="SetPin" component={SetPin} />
-    {/* <stack.Screen name="Another" component={Another} /> */}
     </stack.Navigator>
   </NavigationContainer>
 
