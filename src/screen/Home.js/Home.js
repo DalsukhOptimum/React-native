@@ -116,7 +116,7 @@ const Home = ({navigation}) => {
               console.log('error aaya ', error);
             }
 
-            navigation.navigate('Mpin');
+            navigation.navigate('Mpin',{Email:json.ArrayOfResponse[0].Official_EmaildID});
           } else if (
             json?.ArrayOfResponse[0].PinStatus != null &&
             value != null

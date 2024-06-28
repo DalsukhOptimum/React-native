@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TextInput,
-  Pressable,
-  
-} from 'react-native';
+import {View, Text, SafeAreaView, TextInput, Pressable} from 'react-native';
 //  import {AsyncStorage} from '@react-native-async-storage/async-storage'
 import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
@@ -17,30 +10,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Mpin = ({route, navigation}) => {
   const [loader, setloader] = useState(false);
   const [pin, setpin] = useState('');
-  const [Errors,SetErrors] = useState("");
+  const [Errors, SetErrors] = useState('');
   const [Submmited, setSubmmited] = useState(false);
-
   const [Email, setEmail] = useState('');
-  // const PassedEmail = route.params?.Email ;
-
-
-  useEffect(() => {
-  if(!pin)
-    {
-      SetErrors("Please Enter Pin");
-    }
-    else if(pin.match("^(?!(.)\\1{3})(?!19|20)\d{4}$"))
-    {
-        SetErrors("Please Enter Pin");
-    }
-    else{
-      SetErrors("");
-    }
-  }, [pin])
+  const PassesEmail =  route.params?.Email;
   
 
   useEffect(() => {
-    // retrieveData = async () => {
+    if (!pin) {
+      SetErrors('Please Enter Pin');
+    } else if (!pin.match("^[0-9]{4}$")) {
+      SetErrors('only 4 Digit is valid');
+    } else {
+      SetErrors('');
+    }
+  }, [pin]);
+
+  useEffect(() => {
+
     (async () => {
       try {
         const value = await AsyncStorage.getItem('@Data');
@@ -59,20 +46,32 @@ const Mpin = ({route, navigation}) => {
     return;
   }, []);
 
-  console.log('This is Verify pin dataL: ', Email);
+  console.log('This is Verify pin data: ', Email);
 
   LoginPgae = () => {
     navigation.navigate('Home');
   };
 
-  submit = () => {
-
+  submit = async () => {
     setSubmmited(true);
-    if(Errors)
-      {
-        alert("Please Enter valid pin");
-        return;
-      }
+    if (Errors) {
+      alert('Please Enter valid pin');
+      return;
+    }
+
+    // try {
+    //   const value = await AsyncStorage.getItem('@Data');
+    //   console.log('i am printing the values: ', value);
+    //   if (value !== null) {
+    //     let data = await JSON.parse(value);
+    //     console.log('this is final data object: ', data);
+    //     setEmail(data.Official_EmaildID);
+
+    //     console.log('this is Email ', Email);
+    //   }
+    // } catch (error) {
+    //   console.log('i am in catch block ', error);
+    // }
 
     fetch('http://localhost:3446/api/PINOperation/VerifyPin', {
       method: 'POST',
@@ -80,7 +79,7 @@ const Mpin = ({route, navigation}) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({Official_EmaildID: Email, Pin: pin}),
+      body: JSON.stringify({Official_EmaildID:(PassesEmail)?PassesEmail:Email , Pin: pin}),
     })
       .then(resp => resp.json())
       .then(async json => {
@@ -103,26 +102,27 @@ const Mpin = ({route, navigation}) => {
         }
 
         console.log(json);
+        setpin('');
         setloader(false);
+        setSubmmited(false);
       })
       .catch(error => {
         setloader(true);
         console.error(error);
       })
-      .finally(() => {});
+      .finally(() => {
+        // setpin('');
+        // setEmail('');
+      });
   };
 
-  // const {Data} = route.params.Data
-
-  // console.log(Email);
-  // console.log('Data: ', route.params.Data);
   return (
     <SafeAreaView style={styles.container}>
       <Loder Start={loader} />
-      <Text style={styles.title}>Verify Pin</Text>
+      <Text style={styles.title}>Verify Pin </Text>
       <View style={styles.inputView}>
         <TextInput
-        keyboardType='numeric'
+          keyboardType="numeric"
           style={[styles.input, {marginTop: 10}]}
           placeholder="PIN"
           secureTextEntry
@@ -132,7 +132,7 @@ const Mpin = ({route, navigation}) => {
           autoCapitalize="none"
         />
       </View>
-      <Text style = {{color:'red'}}>{(Errors && Submmited) ?Errors:""}</Text>
+      <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
 
       <View style={styles.buttonView}>
         <Pressable style={styles.button} onPress={() => submit()}>
