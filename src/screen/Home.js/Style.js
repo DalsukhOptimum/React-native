@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
         alignItems : "center",
         // paddingTop: 70,
         backgroundColor: '#93D3D7'
+      
       },
       image : {
         height : 160,

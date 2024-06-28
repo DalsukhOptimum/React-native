@@ -1,4 +1,4 @@
-import {View, Text, SafeAreaView, TextInput, Pressable} from 'react-native';
+import {View, Text, SafeAreaView, TextInput, Pressable,Keyboard,TouchableWithoutFeedback} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
@@ -92,6 +92,7 @@ export default function SetPin({route, navigation}) {
       <Loder Start={loader} />
       <Text style={styles.title}>Set Pin</Text>
       <View style={styles.inputView}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <TextInput
           style={[styles.input, {marginTop: 10}]}
           placeholder="PIN"
@@ -102,6 +103,7 @@ export default function SetPin({route, navigation}) {
           autoCapitalize="none"
           keyboardType="numeric"
         />
+        </TouchableWithoutFeedback>
       </View>
       <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
       <View style={styles.buttonView}>

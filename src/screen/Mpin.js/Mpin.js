@@ -1,4 +1,4 @@
-import {View, Text, SafeAreaView, TextInput, Pressable} from 'react-native';
+import {View, Text, SafeAreaView, TextInput, Pressable,Keyboard,TouchableWithoutFeedback} from 'react-native';
 //  import {AsyncStorage} from '@react-native-async-storage/async-storage'
 import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
@@ -121,6 +121,7 @@ const Mpin = ({route, navigation}) => {
       <Loder Start={loader} />
       <Text style={styles.title}>Verify Pin </Text>
       <View style={styles.inputView}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <TextInput
           keyboardType="numeric"
           style={[styles.input, {marginTop: 10}]}
@@ -130,7 +131,9 @@ const Mpin = ({route, navigation}) => {
           onChangeText={setpin}
           autoCorrect={false}
           autoCapitalize="none"
+          
         />
+      </TouchableWithoutFeedback>
       </View>
       <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
 

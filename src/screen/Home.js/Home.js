@@ -5,6 +5,8 @@ import {
   Image,
   TextInput,
   Pressable,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 // import {AsyncStorage} from '@react-native-async-storage/async-storage'
 import React, {useState, useEffect} from 'react';
@@ -116,7 +118,9 @@ const Home = ({navigation}) => {
               console.log('error aaya ', error);
             }
 
-            navigation.navigate('Mpin',{Email:json.ArrayOfResponse[0].Official_EmaildID});
+            navigation.navigate('Mpin', {
+              Email: json.ArrayOfResponse[0].Official_EmaildID,
+            });
           } else if (
             json?.ArrayOfResponse[0].PinStatus != null &&
             value != null
@@ -178,32 +182,36 @@ const Home = ({navigation}) => {
       />
 
       <View style={styles.inputView}>
-        <TextInput
-          style={styles.input}
-          placeholder="EMAIL"
-          value={username}
-          onChange={() => {}}
-          onChangeText={value => {
-            setUsername(value);
-          }}
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <TextInput
+            style={styles.input}
+            placeholder="EMAIL"
+            value={username}
+            onChange={() => {}}
+            onChangeText={value => {
+              setUsername(value);
+            }}
+            autoCorrect={false}
+            autoCapitalize="none"
+          />
+        </TouchableWithoutFeedback>
         <Text style={{color: 'red'}}>
           {Errors.Email && Submmited ? Errors.Email : ''}
         </Text>
-        <TextInput
-          style={[styles.input, {marginTop: 10}]}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChange={() => {}}
-          onChangeText={value => {
-            setPassword(value);
-          }}
-          autoCorrect={false}
-          autoCapitalize="none"
-        />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChange={() => {}}
+            onChangeText={value => {
+              setPassword(value);
+            }}
+            autoCorrect={false}
+            autoCapitalize="none"
+          />
+        </TouchableWithoutFeedback>
         <Text style={{color: 'red'}}>
           {Errors.Password && Submmited ? Errors.Password : ''}
         </Text>
