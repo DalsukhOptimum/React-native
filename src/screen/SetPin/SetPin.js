@@ -1,7 +1,8 @@
-import { View, Text, SafeAreaView,TextInput,Pressable, AsyncStorage } from 'react-native'
+import { View, Text, SafeAreaView,TextInput,Pressable } from 'react-native'
 import React, {useState} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function SetPin({route,navigation}) {

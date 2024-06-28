@@ -5,13 +5,13 @@ import {
   Image,
   TextInput,
   Pressable,
-  AsyncStorage,
 } from 'react-native';
 // import {AsyncStorage} from '@react-native-async-storage/async-storage'
 import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
 import {Dropdown} from 'react-native-element-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -19,41 +19,64 @@ const Home = ({navigation}) => {
   const [loader, setloader] = useState(false);
   const [Role, setRole] = useState(0);
   const [isFocus, setIsFocus] = useState(false);
+  const [Errors, setErrors] = useState({Email: '', Password: ''});
+  const [IsErrors, setIsErrors] = useState(false);
+  const [Submmited, setSubmmited] = useState(false);
 
   const data = [
     {label: 'Employee', value: '0'},
     {label: 'Admin', value: '1'},
   ];
 
-  // useEffect(() => {
-  //   // retrieveData = async () => {
-  //   (async () => {
-  //     try {
-  //       const value = await AsyncStorage.getItem('@Data');
-  //       console.log('i am printing the values: ', value);
-  //       if (value !== null) {
-  //         console.log('i am redirecting');
-  //         let data = await JSON.parse(value);
-  //         console.log('this is last ', data);
-  //         navigation.navigate('Mpin', {
-  //           Email: data.Official_EmaildID,
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.log('i am in catch block ', error);
-  //     }
-  //   })();
-  //   return;
-  // }, []);
+  useEffect(() => {
+    validation();
+  }, [username, password]);
+
+  function validation() {
+    setIsErrors(false);
+    let RecordError = Errors;
+    console.log('my username ', username);
+    console.log(Submmited);
+
+    let cnt = 0;
+
+    if (username == '') {
+      console.log('this is here');
+      RecordError.Email = 'Please Enter Email';
+      setIsErrors(true);
+    } else if (!username.match('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')) {
+      RecordError.Email = 'Please Enter Valid Email';
+      setIsErrors(true);
+    } else {
+      RecordError.Email = '';
+      cnt++;
+    }
+
+    if (password == '') {
+      RecordError.Password = 'Please Enter Password';
+      setIsErrors(true);
+    } else {
+      RecordError.Password = '';
+      cnt++;
+    }
+    if (cnt == 2) {
+      setIsErrors(false);
+    }
+
+    setErrors(RecordError);
+    console.log(IsErrors);
+  }
 
   function submit() {
+    setSubmmited(true);
+    console.log('before going ', Submmited);
+    validation();
+    console.log('after coming, ', IsErrors);
+    if (IsErrors == true) {
+      alert('Enter valid');
+      return;
+    }
 
-    // let EmailRegex ="^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$" ;
-    if(username == "")
-      {
-        alert("Please enter Valid Email");
-        return ;
-      }
     setloader(true);
     console.log(username, password);
     fetch('http://localhost:3446/api/Login/LoginHrms', {
@@ -62,7 +85,11 @@ const Home = ({navigation}) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({role:Role , username: username, password: password}),
+      body: JSON.stringify({
+        role: Role,
+        username: username,
+        password: password,
+      }),
     })
       .then(resp => resp.json())
       .then(async json => {
@@ -79,6 +106,16 @@ const Home = ({navigation}) => {
           }
 
           if (json?.ArrayOfResponse[0].PinStatus != null && value == null) {
+            try {
+              AsyncStorage.clear();
+              await AsyncStorage.setItem(
+                '@Data',
+                JSON.stringify(json.ArrayOfResponse[0]),
+              );
+            } catch (error) {
+              console.log('error aaya ', error);
+            }
+
             navigation.navigate('Mpin');
           } else if (
             json?.ArrayOfResponse[0].PinStatus != null &&
@@ -88,8 +125,7 @@ const Home = ({navigation}) => {
               Employee_Code: json.ArrayOfResponse[0].Employee_Code,
               Email: json.ArrayOfResponse[0].Official_EmaildID,
             });
-          }
-          else{
+          } else {
             navigation.navigate('SetPin', {
               Employee_Code: json.ArrayOfResponse[0].Employee_Code,
               Email: json.ArrayOfResponse[0].Official_EmaildID,
@@ -105,8 +141,10 @@ const Home = ({navigation}) => {
         console.error(error);
       })
       .finally(() => {
-        setPassword("");
-        setUsername("");
+        setPassword('');
+        setUsername('');
+        setErrors({Email: '', Password: ''});
+        setSubmmited(false);
         setloader(false);
       });
   }
@@ -114,7 +152,6 @@ const Home = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Loder Start={loader} />
-
 
       <Text style={styles.title}>HRMS</Text>
 
@@ -129,7 +166,7 @@ const Home = ({navigation}) => {
         maxHeight={300}
         labelField="label"
         valueField="Role"
-        placeholder={!isFocus ? (Role == 0)?'Employee':'Admin' : '...'}
+        placeholder={!isFocus ? (Role == 0 ? 'Employee' : 'Admin') : '...'}
         searchPlaceholder="Search..."
         value={Role}
         onFocus={() => setIsFocus(true)}
@@ -140,25 +177,36 @@ const Home = ({navigation}) => {
         }}
       />
 
-
       <View style={styles.inputView}>
         <TextInput
           style={styles.input}
           placeholder="EMAIL"
           value={username}
-          onChangeText={setUsername}
+          onChange={() => {}}
+          onChangeText={value => {
+            setUsername(value);
+          }}
           autoCorrect={false}
           autoCapitalize="none"
         />
+        <Text style={{color: 'red'}}>
+          {Errors.Email && Submmited ? Errors.Email : ''}
+        </Text>
         <TextInput
           style={[styles.input, {marginTop: 10}]}
-          placeholder="PIN"
+          placeholder="Password"
           secureTextEntry
           value={password}
-          onChangeText={setPassword}
+          onChange={() => {}}
+          onChangeText={value => {
+            setPassword(value);
+          }}
           autoCorrect={false}
           autoCapitalize="none"
         />
+        <Text style={{color: 'red'}}>
+          {Errors.Password && Submmited ? Errors.Password : ''}
+        </Text>
       </View>
       <View style={styles.rememberView}></View>
 
