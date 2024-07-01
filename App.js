@@ -26,28 +26,28 @@ const  App = (props)=> {
 
 
   const [mpinCheck, setmpinCheck] = useState(false)
-  useEffect(() => {
+  // useEffect(() => {
 
-    (async () => {
-      try {
-        const value = await AsyncStorage.getItem('@Data');
-        console.log('i am printing the values: ', value);
-        setmpinCheck(value ? true: false)
-        if (value !== null) {
+  //   (async () => {
+  //     try {
+  //       const value = await AsyncStorage.getItem('@Data');
+  //       console.log('i am printing the values: ', value);
+  //       setmpinCheck(value ? true: false)
+  //       if (value !== null) {
           
-          console.log('i am redirecting');
-          let data = await JSON.parse(value);
-          console.log('this is last ', data);
-          navigation.navigate('Mpin', {
-            Email: data.Official_EmaildID,
-          });
-        }
-      } catch (error) {
-        console.log('i am in catch block ', error);
-      }
-    })();
-    return;
-  }, []);
+  //         console.log('i am redirecting');
+  //         let data = await JSON.parse(value);
+  //         console.log('this is last ', data);
+  //         navigation.navigate('Mpin', {
+  //           Email: data.Official_EmaildID,
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.log('i am in catch block ', error);
+  //     }
+  //   })();
+  //   return;
+  // }, []);
 
   return (
     <NavigationContainer>

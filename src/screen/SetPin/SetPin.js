@@ -1,10 +1,29 @@
-import {View, Text, SafeAreaView, TextInput, Pressable,Keyboard,TouchableWithoutFeedback} from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TextInput,
+  Pressable,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+
+const CELL_COUNT = 4;
+
 export default function SetPin({route, navigation}) {
+  const [enableMask, setEnableMask] = useState(true);
+
   const [click, setClick] = useState(false);
   const [username, setUsername] = useState('');
   const [pin, setpin] = useState('');
@@ -13,6 +32,8 @@ export default function SetPin({route, navigation}) {
   const Email = route.params.Email;
   const [Errors, SetErrors] = useState('');
   const [Submmited, setSubmmited] = useState(false);
+
+  const ref = useBlurOnFulfill({pin, cellCount: CELL_COUNT});
 
   console.log('set pin: ', Email);
 
@@ -25,6 +46,26 @@ export default function SetPin({route, navigation}) {
       SetErrors('');
     }
   }, [pin]);
+
+  const toggleMask = () => setEnableMask(f => !f);
+  const renderCell = ({index, symbol, isFocused}) => {
+    let textChild = null;
+
+    if (symbol) {
+      textChild = enableMask ? '•' : symbol;
+    } else if (isFocused) {
+      textChild = <Cursor />;
+    }
+    return (
+      <Text
+        key={index}
+        style={[styles.cell, isFocused && styles.focusCell]}
+        // onLayout={getCellOnLayoutHandler(index)}
+      >
+        {textChild}
+      </Text>
+    );
+  };
 
   submit = () => {
     setSubmmited(true);
@@ -92,7 +133,7 @@ export default function SetPin({route, navigation}) {
       <Loder Start={loader} />
       <Text style={styles.title}>Set Pin</Text>
       <View style={styles.inputView}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <TextInput
           style={[styles.input, {marginTop: 10}]}
           placeholder="PIN"
@@ -103,7 +144,18 @@ export default function SetPin({route, navigation}) {
           autoCapitalize="none"
           keyboardType="numeric"
         />
-        </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback> */}
+
+        <CodeField
+          ref={ref}
+          // {...props}
+          value={pin}
+          onChangeText={setpin}
+          cellCount={CELL_COUNT}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          renderCell={renderCell}
+        />
       </View>
       <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
       <View style={styles.buttonView}>

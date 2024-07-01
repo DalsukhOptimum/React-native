@@ -8,12 +8,17 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
+// import LOGOSVG from "../../assets/OptimumLogo.svg";
 // import {AsyncStorage} from '@react-native-async-storage/async-storage'
 import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
 import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+const logo = require("../../assets/logo1.png")
 
 const Home = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -22,7 +27,7 @@ const Home = ({navigation}) => {
   const [Role, setRole] = useState(0);
   const [isFocus, setIsFocus] = useState(false);
   const [Errors, setErrors] = useState({Email: '', Password: ''});
-  const [IsErrors, setIsErrors] = useState(false);
+
   const [Submmited, setSubmmited] = useState(false);
 
   const data = [
@@ -30,52 +35,39 @@ const Home = ({navigation}) => {
     {label: 'Admin', value: '1'},
   ];
 
-  useEffect(() => {
-    validation();
-  }, [username, password]);
+  // useEffect(() => {
+  //   validation();
+  // }, [username, password]);
 
-  function validation() {
-    setIsErrors(false);
+  function validation(username,password) {
     let RecordError = Errors;
-    console.log('my username ', username);
-    console.log(Submmited);
 
-    let cnt = 0;
-
-    if (username == '') {
+    if (username == "") {
       console.log('this is here');
       RecordError.Email = 'Please Enter Email';
-      setIsErrors(true);
-    } else if (!username.match('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')) {
+    } else if (!username?.match('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')) {
       RecordError.Email = 'Please Enter Valid Email';
-      setIsErrors(true);
     } else {
-      RecordError.Email = '';
-      cnt++;
+      RecordError.Email = "";
     }
 
-    if (password == '') {
+    if (password == "") {
       RecordError.Password = 'Please Enter Password';
-      setIsErrors(true);
     } else {
-      RecordError.Password = '';
-      cnt++;
-    }
-    if (cnt == 2) {
-      setIsErrors(false);
+      RecordError.Password = "";
     }
 
     setErrors(RecordError);
-    console.log(IsErrors);
   }
 
   function submit() {
     setSubmmited(true);
     console.log('before going ', Submmited);
-    validation();
-    console.log('after coming, ', IsErrors);
-    if (IsErrors == true) {
+    validation(username,password);
+
+    if (Errors.Email != '' || Errors.Password != '') {
       alert('Enter valid');
+     
       return;
     }
 
@@ -97,7 +89,7 @@ const Home = ({navigation}) => {
       .then(async json => {
         let value;
         if (json?.status == 'Error') {
-          alert(json?.message);
+          alert("No User Found");
         }
         if (json?.status == 'success') {
           try {
@@ -139,6 +131,7 @@ const Home = ({navigation}) => {
 
         console.log(json);
         setloader(false);
+        setSubmmited(false);
       })
       .catch(error => {
         setloader(false);
@@ -148,7 +141,7 @@ const Home = ({navigation}) => {
         setPassword('');
         setUsername('');
         setErrors({Email: '', Password: ''});
-        setSubmmited(false);
+       
         setloader(false);
       });
   }
@@ -157,14 +150,19 @@ const Home = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       <Loder Start={loader} />
 
-      <Text style={styles.title}>HRMS</Text>
+      {/* <Text style={styles.title}>HRMS</Text> */}
 
-      <Dropdown
+    <View style={styles.Form}>
+    
+   <Image source={logo} style={styles.image} resizeMode='contain' /> 
+
+      <Dropdown 
         style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
+        // optionsTextStyle={styles.optionsTextStyle}
         data={data}
         search
         maxHeight={300}
@@ -181,15 +179,16 @@ const Home = ({navigation}) => {
         }}
       />
 
-      <View style={styles.inputView}>
+      <View style={styles.placeholderStyle}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <TextInput
             style={styles.input}
             placeholder="EMAIL"
             value={username}
-            onChange={() => {}}
-            onChangeText={value => {
+             onChangeText={(value)   =>{
               setUsername(value);
+              validation(value,password);
+
             }}
             autoCorrect={false}
             autoCapitalize="none"
@@ -204,9 +203,9 @@ const Home = ({navigation}) => {
             placeholder="Password"
             secureTextEntry
             value={password}
-            onChange={() => {}}
-            onChangeText={value => {
+            onChangeText={(value)=>{
               setPassword(value);
+              validation(username,value);
             }}
             autoCorrect={false}
             autoCapitalize="none"
@@ -218,11 +217,12 @@ const Home = ({navigation}) => {
       </View>
       <View style={styles.rememberView}></View>
 
-      <View style={styles.buttonView}>
+      <View style={styles.placeholderStyle}>
         <Pressable style={styles.button} onPress={() => submit()}>
           <Text style={styles.buttonText}>LOGIN</Text>
         </Pressable>
       </View>
+   </View>
     </SafeAreaView>
   );
 };

@@ -15,7 +15,7 @@ const Routes = (stack,Flag) => {
    <>
      <Stack.Screen name="Mpin" component={Mpin} />
      <Stack.Screen name="Home" component={Home}   options={{headerShown: false}}/>
-     <Stack.Screen name="Webview" component={Webview} />
+     <Stack.Screen name="HRMS" component={Webview} />
      <Stack.Screen name="SetPin" component={SetPin} />
      </>
      :
