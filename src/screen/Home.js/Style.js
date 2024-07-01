@@ -2,15 +2,14 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   Form: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderRadius: 6,
-    height: 430,
-    // width:330,
-    paddingVertical: 25,
-    paddingHorizontal: 25,
+    // backgroundColor: '#FFFFFF',
+    // borderWidth: 1,
+    // borderRadius: 6,
+    // height: 430,
+    // paddingVertical: 25,
+    // paddingHorizontal: 25,
   
-    elevation: 10,
+    //elevation: 10,
     // backgroundColor: 'rgba(0, 0, 0, 1)',
   },
   container: {
@@ -18,7 +17,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     // paddingTop: 70,
-    backgroundColor: '#93D3D7',
+   // backgroundColor: '#FFFFFF',
+     backgroundColor: '#93D3D7',
   },
   image: {
     height: 100,

@@ -150,11 +150,11 @@ const Home = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       <Loder Start={loader} />
 
-      {/* <Text style={styles.title}>HRMS</Text> */}
+       <Text style={styles.title}>HRMS</Text> 
 
     <View style={styles.Form}>
     
-   <Image source={logo} style={styles.image} resizeMode='contain' /> 
+   {/* <Image source={logo} style={styles.image} resizeMode='contain' />   */}
 
       <Dropdown 
         style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}

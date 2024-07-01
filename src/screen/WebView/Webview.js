@@ -10,9 +10,9 @@ import {
     SafeAreaView,
     StyleSheet
   } from 'react-native';
-  import React from 'react';
+  import React,{useEffect} from 'react';
   import {WebView} from 'react-native-webview';
-  import {useRef, useState, useEffect} from 'react';
+  import {useRef, useState} from 'react';
 
   const Webview = ({route,navigation}) => {
   const ResponseData = route.params.Data ;
