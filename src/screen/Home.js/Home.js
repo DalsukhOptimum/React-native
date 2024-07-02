@@ -16,9 +16,7 @@ import Loder from '../../component/Loder';
 import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
-const logo = require("../../assets/logo1.png")
+const logo = require('../../assets/logo1.png');
 
 const Home = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -35,26 +33,24 @@ const Home = ({navigation}) => {
     {label: 'Admin', value: '1'},
   ];
 
-  // useEffect(() => {
-  //   validation();
-  // }, [username, password]);
 
-  function validation(username,password) {
+
+  function validation(username, password) {
     let RecordError = Errors;
 
-    if (username == "") {
+    if (username == '') {
       console.log('this is here');
       RecordError.Email = 'Please Enter Email';
     } else if (!username?.match('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')) {
       RecordError.Email = 'Please Enter Valid Email';
     } else {
-      RecordError.Email = "";
+      RecordError.Email = '';
     }
 
-    if (password == "") {
+    if (password == '') {
       RecordError.Password = 'Please Enter Password';
     } else {
-      RecordError.Password = "";
+      RecordError.Password = '';
     }
 
     setErrors(RecordError);
@@ -63,11 +59,11 @@ const Home = ({navigation}) => {
   function submit() {
     setSubmmited(true);
     console.log('before going ', Submmited);
-    validation(username,password);
+    validation(username, password);
 
     if (Errors.Email != '' || Errors.Password != '') {
       alert('Enter valid');
-     
+
       return;
     }
 
@@ -89,7 +85,7 @@ const Home = ({navigation}) => {
       .then(async json => {
         let value;
         if (json?.status == 'Error') {
-          alert("No User Found");
+          alert('No User Found');
         }
         if (json?.status == 'success') {
           try {
@@ -141,7 +137,7 @@ const Home = ({navigation}) => {
         setPassword('');
         setUsername('');
         setErrors({Email: '', Password: ''});
-       
+
         setloader(false);
       });
   }
@@ -150,81 +146,80 @@ const Home = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       <Loder Start={loader} />
 
-       <Text style={styles.title}>HRMS</Text> 
+      <Text style={styles.title}>HRMS</Text>
 
-    <View style={styles.Form}>
-    
-   {/* <Image source={logo} style={styles.image} resizeMode='contain' />   */}
+      <View style={styles.Form}>
+        {/* <Image source={logo} style={styles.image} resizeMode='contain' />   */}
 
-      <Dropdown 
-        style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        // optionsTextStyle={styles.optionsTextStyle}
-        data={data}
-        search
-        maxHeight={300}
-        labelField="label"
-        valueField="Role"
-        placeholder={!isFocus ? (Role == 0 ? 'Employee' : 'Admin') : '...'}
-        searchPlaceholder="Search..."
-        value={Role}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={item => {
-          setRole(item.value);
-          setIsFocus(false);
-        }}
-      />
+        <Dropdown
+          style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          iconStyle={styles.iconStyle}
+          // optionsTextStyle={styles.optionsTextStyle}
+          data={data}
+          search
+          maxHeight={300}
+          labelField="label"
+          valueField="Role"
+          placeholder={!isFocus ? (Role == 0 ? 'Employee' : 'Admin') : '...'}
+          searchPlaceholder="Search..."
+          value={Role}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
+          onChange={item => {
+            setRole(item.value);
+            setIsFocus(false);
+          }}
+        />
 
-      <View style={styles.placeholderStyle}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <TextInput
-            style={styles.input}
-            placeholder="EMAIL"
-            value={username}
-             onChangeText={(value)   =>{
-              setUsername(value);
-              validation(value,password);
+        <View style={styles.placeholderStyle}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TextInput
+              style={styles.input}
+              placeholder="EMAIL"
+              value={username}
+              onChangeText={value => {
+                setUsername(value);
+                validation(value, password);
+              }}
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+          </TouchableWithoutFeedback>
+          <Text style={{color: 'red'}}>
+            {Errors.Email && Submmited ? Errors.Email : ''}
+          </Text>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={value => {
+                setPassword(value);
+                validation(username, value);
+              }}
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+          </TouchableWithoutFeedback>
+          <Text style={{color: 'red'}}>
+            {Errors.Password && Submmited ? Errors.Password : ''}
+          </Text>
+        </View>
+        <View style={styles.rememberView}></View>
 
-            }}
-            autoCorrect={false}
-            autoCapitalize="none"
-          />
-        </TouchableWithoutFeedback>
-        <Text style={{color: 'red'}}>
-          {Errors.Email && Submmited ? Errors.Email : ''}
-        </Text>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={(value)=>{
-              setPassword(value);
-              validation(username,value);
-            }}
-            autoCorrect={false}
-            autoCapitalize="none"
-          />
-        </TouchableWithoutFeedback>
-        <Text style={{color: 'red'}}>
-          {Errors.Password && Submmited ? Errors.Password : ''}
-        </Text>
+        <View style={styles.placeholderStyle}>
+          <Pressable style={styles.button} onPress={() => submit()}>
+            <Text style={styles.buttonText}>LOGIN</Text>
+          </Pressable>
+        </View>
       </View>
-      <View style={styles.rememberView}></View>
-
-      <View style={styles.placeholderStyle}>
-        <Pressable style={styles.button} onPress={() => submit()}>
-          <Text style={styles.buttonText}>LOGIN</Text>
-        </Pressable>
-      </View>
-   </View>
     </SafeAreaView>
   );
 };
 
 export default Home;
+ 

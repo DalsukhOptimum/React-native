@@ -68,6 +68,7 @@ export default function SetPin({route, navigation}) {
   };
 
   submit = () => {
+    Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
       alert('Please Enter valid pin');
@@ -133,22 +134,12 @@ export default function SetPin({route, navigation}) {
       <Loder Start={loader} />
       <Text style={styles.title}>Set Pin</Text>
       <View style={styles.inputView}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <TextInput
-          style={[styles.input, {marginTop: 10}]}
-          placeholder="PIN"
-          secureTextEntry
-          value={pin}
-          onChangeText={setpin}
-          autoCorrect={false}
-          autoCapitalize="none"
-          keyboardType="numeric"
-        />
-        </TouchableWithoutFeedback> */}
-
         <CodeField
           ref={ref}
-          // {...props}
+          onSubmitEditing={event => {
+            Keyboard.dismiss();
+            submit();
+          }}
           value={pin}
           onChangeText={setpin}
           cellCount={CELL_COUNT}

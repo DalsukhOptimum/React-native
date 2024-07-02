@@ -32,10 +32,6 @@ const Mpin = ({route, navigation}) => {
   const PassesEmail = route.params?.Email;
 
   const ref = useBlurOnFulfill({pin, cellCount: CELL_COUNT});
-  //const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-  //   pin,
-  //   setpin,
-  // });
 
   const toggleMask = () => setEnableMask(f => !f);
   const renderCell = ({index, symbol, isFocused}) => {
@@ -93,6 +89,7 @@ const Mpin = ({route, navigation}) => {
   };
 
   submit = async () => {
+    Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
       alert('Please Enter valid pin');
@@ -139,10 +136,7 @@ const Mpin = ({route, navigation}) => {
         setloader(true);
         console.error(error);
       })
-      .finally(() => {
-        // setpin('');
-        // setEmail('');
-      });
+      .finally(() => {});
   };
 
   return (
@@ -150,23 +144,13 @@ const Mpin = ({route, navigation}) => {
       <Loder Start={loader} />
       <Text style={styles.title}>Verify Pin </Text>
       <View style={styles.inputView}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <TextInput
-          keyboardType="numeric"
-          style={[styles.input, {marginTop: 10}]}
-          placeholder="PIN"
-          secureTextEntry
-          value={pin}
-          onChangeText={setpin}
-          autoCorrect={false}
-          autoCapitalize="none"
-          keyboardState
-        />
-      </TouchableWithoutFeedback> */}
-
         <CodeField
+          onSubmitEditing={event => {
+            Keyboard.dismiss();
+            submit();
+          }}
           ref={ref}
-          // {...props}
+          // {...props}#000
           value={pin}
           onChangeText={setpin}
           cellCount={CELL_COUNT}
@@ -174,6 +158,7 @@ const Mpin = ({route, navigation}) => {
           textContentType="oneTimeCode"
           renderCell={renderCell}
         />
+        {/* </TouchableWithoutFeedback> */}
       </View>
       <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
 
