@@ -33,8 +33,6 @@ const Home = ({navigation}) => {
     {label: 'Admin', value: '1'},
   ];
 
-
-
   function validation(username, password) {
     let RecordError = Errors;
 
@@ -86,60 +84,66 @@ const Home = ({navigation}) => {
         let value;
         if (json?.status == 'Error') {
           alert('No User Found');
+          setPassword('');
+          setUsername('');
+          setErrors({Email: '', Password: ''});
+
+          setloader(false);
+
+          setSubmmited(false);
         }
         if (json?.status == 'success') {
-          try {
-            value = await AsyncStorage.getItem('@Data');
-            console.log('i am printing the values: ', value);
-          } catch (error) {
-            console.log('i am in catch block ', error);
-          }
+          let Data = json?.ArrayOfResponse[0];
+          fetch('http://localhost:3446/api/OTPController/GenerateOTP', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              Official_EmaildID: json?.ArrayOfResponse[0].Official_EmaildID,
+            }),
+          })
+            .then(resp => resp.json())
+            .then(async json => {
+              let value;
+              if (json?.Code == '400') {
+                alert(json?.Message);
+              }
+              else if(json?.Code == '500')
+                {
+                  alert("Something went wrong");
+                }
+              else {
+                navigation.navigate('VerifyOTP', {
+                  Data: Data,
+                });
+              }
 
-          if (json?.ArrayOfResponse[0].PinStatus != null && value == null) {
-            try {
-              AsyncStorage.clear();
-              await AsyncStorage.setItem(
-                '@Data',
-                JSON.stringify(json.ArrayOfResponse[0]),
-              );
-            } catch (error) {
-              console.log('error aaya ', error);
-            }
+              setPassword('');
+              setUsername('');
+              setErrors({Email: '', Password: ''});
 
-            navigation.navigate('Mpin', {
-              Email: json.ArrayOfResponse[0].Official_EmaildID,
-            });
-          } else if (
-            json?.ArrayOfResponse[0].PinStatus != null &&
-            value != null
-          ) {
-            navigation.navigate('SetPin', {
-              Employee_Code: json.ArrayOfResponse[0].Employee_Code,
-              Email: json.ArrayOfResponse[0].Official_EmaildID,
-            });
-          } else {
-            navigation.navigate('SetPin', {
-              Employee_Code: json.ArrayOfResponse[0].Employee_Code,
-              Email: json.ArrayOfResponse[0].Official_EmaildID,
-            });
-          }
+              setloader(false);
+
+              setSubmmited(false);
+            })
+            .catch(error => {
+              setPassword('');
+              setUsername('');
+              setErrors({Email: '', Password: ''});
+              setloader(false);
+
+              setSubmmited(false);
+            })
+            .finally(() => {});
         }
-
-        console.log(json);
-        setloader(false);
-        setSubmmited(false);
       })
       .catch(error => {
         setloader(false);
         console.error(error);
       })
-      .finally(() => {
-        setPassword('');
-        setUsername('');
-        setErrors({Email: '', Password: ''});
-
-        setloader(false);
-      });
+      .finally(() => {});
   }
 
   return (
@@ -222,4 +226,3 @@ const Home = ({navigation}) => {
 };
 
 export default Home;
- 

@@ -6,7 +6,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     // paddingTop: 70,
-    backgroundColor: '#93D3D7',
+     backgroundColor: '#93D3D7',
+    
   },
   image: {
     height: 160,
