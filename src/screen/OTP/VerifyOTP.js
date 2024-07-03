@@ -1,26 +1,3 @@
-// import {
-//   View,
-//   Text,
-//   SafeAreaView,
-//   TextInput,
-//   Pressable,
-//   Keyboard,
-//   TouchableWithoutFeedback,
-// } from 'react-native';
-// //  import {AsyncStorage} from '@react-native-async-storage/async-storage'
-// import React, {useState, useEffect} from 'react';
-// import {styles} from './style';
-// import Loder from '../../component/Loder';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// import {
-//   CodeField,
-//   Cursor,
-//   useBlurOnFulfill,
-//   useClearByFocusCell,
-// } from 'react-native-confirmation-code-field';
-// const CELL_COUNT = 4;
-
 import {
   Animated,
   Image,
