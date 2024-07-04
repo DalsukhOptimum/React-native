@@ -15,7 +15,7 @@ import {WebView} from 'react-native-webview';
 import {useRef, useState} from 'react';
 
 // import CryptoJS from "react-native-crypto-js";
-import CryptoJS from "react-native-crypto-js";
+import CryptoJS from 'crypto-js';
 
 const Webview = ({route, navigation}) => {
   const ResponseData = route.params.Data;
