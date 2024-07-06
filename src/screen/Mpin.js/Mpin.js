@@ -38,6 +38,7 @@ const Mpin = ({route, navigation}) => {
   const [Email, setEmail] = useState('');
   const [popup, setpopup] = useState(false);
   const PassesEmail = route.params?.Email;
+  const [state, setState] = useState();
 
   const ref = useBlurOnFulfill({pin, cellCount: CELL_COUNT});
 
@@ -60,6 +61,12 @@ const Mpin = ({route, navigation}) => {
       </Text>
     );
   };
+
+  useEffect(() => {
+ return  () => {
+      setState("")
+    };
+}, [navigation]);
 
   useEffect(() => {
     if (!pin) {
@@ -105,7 +112,7 @@ const Mpin = ({route, navigation}) => {
         title: 'Warning',
         textBody: Errors,
       });
-      // setpopup(true);
+       //setpopup(true);
       return;
     }
     setloader(true);
@@ -127,7 +134,7 @@ const Mpin = ({route, navigation}) => {
           Dialog.show({
             type: ALERT_TYPE.WARNING,
             title: 'Error',
-            textBody: 'Pin is Incorrect',
+            textBody: json?.Message,
             button: 'close',
           });
           // alert('PIn is incorrect');
