@@ -12,6 +12,13 @@ import Loder from '../../component/Loder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from 'react-native-alert-notification';
+
+import {
   CodeField,
   Cursor,
   useBlurOnFulfill,
@@ -162,7 +169,11 @@ export default function VerifyOTP({route, navigation}) {
     Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
-      alert('Please Enter valid pin');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Warning',
+        textBody:Errors,
+      })
       return;
     }
 
@@ -183,7 +194,13 @@ export default function VerifyOTP({route, navigation}) {
       .then(async json => {
         let Stoargevalue;
         if (json?.Code == '400') {
-          alert(json?.Message);
+          Dialog.show({
+            type: ALERT_TYPE.WARNING,
+            title: 'Error',
+            textBody:json?.Message ,
+            button: 'close',
+          
+          })
           setloader(false);
           setSubmmited(false);
           setValue('');
@@ -236,6 +253,7 @@ export default function VerifyOTP({route, navigation}) {
   };
 
   return (
+    <AlertNotificationRoot>
     <SafeAreaView style={styles.root}>
       <Loder Start={loader} />
       <Text style={styles.title}>Verification</Text>
@@ -275,5 +293,6 @@ export default function VerifyOTP({route, navigation}) {
         </Text>
       </Text>
     </SafeAreaView>
+    </AlertNotificationRoot>
   );
 }

@@ -19,6 +19,13 @@ import {
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from 'react-native-alert-notification';
+
 const CELL_COUNT = 4;
 
 export default function SetPin({route, navigation}) {
@@ -71,7 +78,11 @@ export default function SetPin({route, navigation}) {
     Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
-      alert('Please Enter valid pin');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Warning',
+        textBody:Errors,
+      })
       return;
     }
 
@@ -86,7 +97,11 @@ export default function SetPin({route, navigation}) {
       .then(resp => resp.json())
       .then(async json => {
         if (json?.Code == '400' || json?.Code == '500') {
-          alert(json?.Message);
+          Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Warning',
+            textBody:json?.Message,
+          })
         }
         if (json?.Code == '200') {
           console.log('i am in set pin page: ');
@@ -107,7 +122,7 @@ export default function SetPin({route, navigation}) {
             console.log('error aaya ', error);
           }
 
-          alert(json?.Message);
+          // alert(json?.Message);
 
           navigation.navigate('Mpin', {
             Email: json.ArrayOfResponse[0].Official_EmaildID,
@@ -130,30 +145,32 @@ export default function SetPin({route, navigation}) {
 
   console.log('this is Employee Code: ', Employee_Code);
   return (
-    <SafeAreaView style={styles.container}>
-      <Loder Start={loader} />
-      <Text style={styles.title}>Set Pin</Text>
-      <View style={styles.inputView}>
-        <CodeField
-          ref={ref}
-          onSubmitEditing={event => {
-            Keyboard.dismiss();
-            submit();
-          }}
-          value={pin}
-          onChangeText={setpin}
-          cellCount={CELL_COUNT}
-          keyboardType="number-pad"
-          textContentType="oneTimeCode"
-          renderCell={renderCell}
-        />
-      </View>
-      <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
-      <View style={styles.buttonView}>
-        <Pressable style={styles.button} onPress={() => submit()}>
-          <Text style={styles.buttonText}>SUBMIT</Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+    <AlertNotificationRoot>
+      <SafeAreaView style={styles.container}>
+        <Loder Start={loader} />
+        <Text style={styles.title}>Set Pin</Text>
+        <View style={styles.inputView}>
+          <CodeField
+            ref={ref}
+            onSubmitEditing={event => {
+              Keyboard.dismiss();
+              submit();
+            }}
+            value={pin}
+            onChangeText={setpin}
+            cellCount={CELL_COUNT}
+            keyboardType="number-pad"
+            textContentType="oneTimeCode"
+            renderCell={renderCell}
+          />
+        </View>
+        <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
+        <View style={styles.buttonView}>
+          <Pressable style={styles.button} onPress={() => submit()}>
+            <Text style={styles.buttonText}>SUBMIT</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 }

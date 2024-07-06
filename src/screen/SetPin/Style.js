@@ -119,6 +119,8 @@ export const styles = StyleSheet.create({
         marginLeft: 8,
         borderRadius: 6,
         backgroundColor: '#eee',
+        color:'grey'
+
       },
       toggle: {
         width: 55,

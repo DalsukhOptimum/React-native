@@ -12,6 +12,13 @@ import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PopUp from '../../component/PopUp';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from 'react-native-alert-notification';
 
 import {
   CodeField,
@@ -29,6 +36,7 @@ const Mpin = ({route, navigation}) => {
   const [Errors, SetErrors] = useState('');
   const [Submmited, setSubmmited] = useState(false);
   const [Email, setEmail] = useState('');
+  const [popup, setpopup] = useState(false);
   const PassesEmail = route.params?.Email;
 
   const ref = useBlurOnFulfill({pin, cellCount: CELL_COUNT});
@@ -92,9 +100,15 @@ const Mpin = ({route, navigation}) => {
     Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
-      alert('Please Enter valid pin');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Warning',
+        textBody: Errors,
+      });
+      // setpopup(true);
       return;
     }
+    setloader(true);
 
     fetch('http://localhost:3446/api/PINOperation/VerifyPin', {
       method: 'POST',
@@ -110,7 +124,13 @@ const Mpin = ({route, navigation}) => {
       .then(resp => resp.json())
       .then(async json => {
         if (json?.Code == '400') {
-          alert('PIn is incorrect');
+          Dialog.show({
+            type: ALERT_TYPE.WARNING,
+            title: 'Error',
+            textBody: 'Pin is Incorrect',
+            button: 'close',
+          });
+          // alert('PIn is incorrect');
         } else if (json?.Code == '200') {
           try {
             AsyncStorage.clear();
@@ -121,7 +141,7 @@ const Mpin = ({route, navigation}) => {
           } catch (error) {
             console.log('error aaya ', error);
           }
-          alert(json?.Message);
+          // alert(json?.Message);
           navigation.navigate('HRMS', {Data: json.ArrayOfResponse[0]});
         } else {
           alert('something went wrong');
@@ -133,48 +153,54 @@ const Mpin = ({route, navigation}) => {
         setSubmmited(false);
       })
       .catch(error => {
-        setloader(true);
+        setloader(false);
         console.error(error);
       })
       .finally(() => {});
   };
 
-  return (
-    <SafeAreaView onclick={Keyboard.dismiss} style={styles.container}>
-      <Loder Start={loader} />
-      <Text style={styles.title}>Verify Pin </Text>
-      <View style={styles.inputView}>
-        <CodeField
-          onSubmitEditing={event => {
-            Keyboard.dismiss();
-            submit();
-          }}
-          ref={ref}
-          // {...props}#000
-          value={pin}
-          onChangeText={setpin}
-          cellCount={CELL_COUNT}
-          keyboardType="number-pad"
-          textContentType="oneTimeCode"
-          renderCell={renderCell}
-        />
-        {/* </TouchableWithoutFeedback> */}
-      </View>
-      <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
+  function Ok() {
+    setpopup(false);
+  }
 
-      <View style={styles.buttonView}>
-        <Pressable style={styles.button} onPress={() => submit()}>
-          <Text style={styles.buttonText}>LOGIN</Text>
-        </Pressable>
-        <Text style={styles.footerText}>
-          Forget Pin?
-          <Text onPress={() => LoginPgae()} style={styles.signup}>
-            {' '}
-            Set Up Pin
+  return (
+    <AlertNotificationRoot>
+      <SafeAreaView onclick={Keyboard.dismiss} style={styles.container}>
+        <Loder Start={loader} />
+        {/* <PopUp Start={popup} Func={() => Ok()} Message={Errors} /> */}
+        <Text style={styles.title}>Verify Pin </Text>
+        <View style={styles.inputView}>
+          <CodeField
+            onSubmitEditing={event => {
+              Keyboard.dismiss();
+              submit();
+            }}
+            ref={ref}
+            value={pin}
+            onChangeText={setpin}
+            cellCount={CELL_COUNT}
+            keyboardType="number-pad"
+            textContentType="oneTimeCode"
+            renderCell={renderCell}
+            textInputStyle={styles.InnerDot}
+          />
+        </View>
+        <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
+
+        <View style={styles.buttonView}>
+          <Pressable style={styles.button} onPress={() => submit()}>
+            <Text style={styles.buttonText}>LOGIN</Text>
+          </Pressable>
+          <Text style={styles.footerText}>
+            Forget Pin?
+            <Text onPress={() => LoginPgae()} style={styles.signup}>
+              {' '}
+              Set Up Pin
+            </Text>
           </Text>
-        </Text>
-      </View>
-    </SafeAreaView>
+        </View>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 };
 

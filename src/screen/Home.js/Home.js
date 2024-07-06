@@ -7,6 +7,7 @@ import {
   Pressable,
   TouchableWithoutFeedback,
   Keyboard,
+  useColorScheme,
 } from 'react-native';
 // import LOGOSVG from "../../assets/OptimumLogo.svg";
 // import {AsyncStorage} from '@react-native-async-storage/async-storage'
@@ -18,6 +19,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const logo = require('../../assets/logo1.png');
 
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from 'react-native-alert-notification';
+
 const Home = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -27,6 +35,7 @@ const Home = ({navigation}) => {
   const [Errors, setErrors] = useState({Email: '', Password: ''});
 
   const [Submmited, setSubmmited] = useState(false);
+  const colorScheme = useColorScheme();
 
   const data = [
     {label: 'Employee', value: '0'},
@@ -60,7 +69,11 @@ const Home = ({navigation}) => {
     validation(username, password);
 
     if (Errors.Email != '' || Errors.Password != '') {
-      alert('Enter valid');
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Warning',
+        textBody: "Please Enter Valid Details",
+      });
 
       return;
     }
@@ -83,7 +96,12 @@ const Home = ({navigation}) => {
       .then(async json => {
         let value;
         if (json?.status == 'Error') {
-          alert('No User Found');
+          Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'Incorrect username or Password',
+            button: 'close',
+          });
           setPassword('');
           setUsername('');
           setErrors({Email: '', Password: ''});
@@ -108,13 +126,18 @@ const Home = ({navigation}) => {
             .then(async json => {
               let value;
               if (json?.Code == '400') {
-                alert(json?.Message);
-              }
-              else if(json?.Code == '500')
-                {
-                  alert("Something went wrong");
-                }
-              else {
+                Toast.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Warning',
+                  textBody: json?.Message,
+                });
+              } else if (json?.Code == '500') {
+                Toast.show({
+                  type: ALERT_TYPE.DANGER, 
+                  title: 'Warning',
+                  textBody: json?.Message,
+                });
+              } else {
                 navigation.navigate('VerifyOTP', {
                   Data: Data,
                 });
@@ -147,81 +170,87 @@ const Home = ({navigation}) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Loder Start={loader} />
+    <AlertNotificationRoot>
+      <SafeAreaView style={styles.container}>
+        <Loder Start={loader} />
 
-      <Text style={styles.title}>HRMS</Text>
+        <Text style={styles.title}>HRMS</Text>
 
-      <View style={styles.Form}>
-        {/* <Image source={logo} style={styles.image} resizeMode='contain' />   */}
-
-        <Dropdown
-          style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          // optionsTextStyle={styles.optionsTextStyle}
-          data={data}
-          search
-          maxHeight={300}
-          labelField="label"
-          valueField="Role"
-          placeholder={!isFocus ? (Role == 0 ? 'Employee' : 'Admin') : '...'}
-          searchPlaceholder="Search..."
-          value={Role}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={item => {
-            setRole(item.value);
-            setIsFocus(false);
-          }}
-        />
-
-        <View style={styles.placeholderStyle}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <TextInput
-              style={styles.input}
-              placeholder="EMAIL"
-              value={username}
-              onChangeText={value => {
-                setUsername(value);
-                validation(value, password);
+        <View style={styles.Form}>
+          {/* <Image source={logo} style={styles.image} resizeMode='contain' />   */}
+          <View style={styles.placeholderStyle}>
+            <Dropdown
+              style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              itemContainerStyle={styles.ContainerStyle}
+              itemTextStyle={styles.ItemStyle}
+              data={data}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="Role"
+              placeholder={
+                !isFocus ? (Role == 0 ? 'Employee' : 'Admin') : '...'
+              }
+              searchPlaceholder="Search..."
+              value={Role}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              onChange={item => {
+                setRole(item.value);
+                setIsFocus(false);
               }}
-              autoCorrect={false}
-              autoCapitalize="none"
             />
-          </TouchableWithoutFeedback>
-          <Text style={{color: 'red'}}>
-            {Errors.Email && Submmited ? Errors.Email : ''}
-          </Text>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              secureTextEntry
-              value={password}
-              onChangeText={value => {
-                setPassword(value);
-                validation(username, value);
-              }}
-              autoCorrect={false}
-              autoCapitalize="none"
-            />
-          </TouchableWithoutFeedback>
-          <Text style={{color: 'red'}}>
-            {Errors.Password && Submmited ? Errors.Password : ''}
-          </Text>
-        </View>
-        <View style={styles.rememberView}></View>
 
-        <View style={styles.placeholderStyle}>
-          <Pressable style={styles.button} onPress={() => submit()}>
-            <Text style={styles.buttonText}>LOGIN</Text>
-          </Pressable>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <TextInput
+                style={styles.input}
+                placeholderTextColor="black"
+                placeholder="EMAIL"
+                value={username}
+                onChangeText={value => {
+                  setUsername(value);
+                  validation(value, password);
+                }}
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+            </TouchableWithoutFeedback>
+            <Text style={{color: 'red'}}>
+              {Errors.Email && Submmited ? Errors.Email : ''}
+            </Text>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <TextInput
+                style={styles.input}
+                placeholderTextColor="black"
+                placeholder="Password"
+                secureTextEntry
+                value={password}
+                onChangeText={value => {
+                  setPassword(value);
+                  validation(username, value);
+                }}
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+            </TouchableWithoutFeedback>
+            <Text style={{color: 'red'}}>
+              {Errors.Password && Submmited ? Errors.Password : ''}
+            </Text>
+          </View>
+          <View style={styles.rememberView}></View>
+
+          <View style={styles.placeholderStyle}>
+            <Pressable style={styles.nextButton} onPress={() => submit()}>
+              <Text style={styles.nextButtonText}>LOGIN</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 };
 

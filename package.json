@@ -16,6 +16,7 @@
     "crypto-js": "^4.1.1",
     "react": "17.0.2",
     "react-native": "0.68.2",
+    "react-native-alert-notification": "^0.4.0",
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-element-dropdown": "^2.12.1",
     "react-native-gesture-handler": "^2.17.1",

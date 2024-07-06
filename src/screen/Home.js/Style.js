@@ -3,14 +3,15 @@ import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
   Form: {
     // backgroundColor: '#FFFFFF',
-    // borderWidth: 1,
-    // borderRadius: 6,
+  //  borderWidth: 1,
+  //   borderRadius: 6,
     // height: 430,
     // paddingVertical: 25,
     // paddingHorizontal: 25,
   
-    //elevation: 10,
-    // backgroundColor: 'rgba(0, 0, 0, 1)',
+    // elevation: 10,
+
+    // backgroundColor: 'rgba(120, 120, 90, 150)',
   },
   container: {
     flex: 1,
@@ -45,7 +46,8 @@ export const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 7,
-    color: '#000',
+    color: 'black',
+   
   },
   rememberView: {
     width: '100%',
@@ -89,7 +91,7 @@ export const styles = StyleSheet.create({
   optionsText: {
     textAlign: 'center',
     paddingVertical: 10,
-    color: 'gray',
+    color: 'black',
     fontSize: 13,
     marginBottom: 6,
   },
@@ -116,12 +118,29 @@ export const styles = StyleSheet.create({
   dropdown: {
     height: 50,
     borderColor: 'black',
-    borderWidth: 0.5,
+    borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
-    width: 260,
-    marginBottom: 10,
-    // color:'red'
+    width: 297,
+    marginBottom: 18,
+    
+    
+  },
+  dropdownDark: {
+    height: 50,
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    width: 297,
+    marginBottom: 18
+    
+  },
+  ItemStyle:{
+    color:'black'
+  },
+  ContainerStyle:{
+    backgroundColor:'white',
   },
   icon: {
     marginRight: 5,
@@ -137,11 +156,11 @@ export const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 16,
-    // color:'#93D3D7'
+     color:'black'
   },
   selectedTextStyle: {
     fontSize: 16,
-    // borderColor:'red'
+    color:'black'
   },
   iconStyle: {
     width: 20,
@@ -150,5 +169,23 @@ export const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+    color:'black'
   },
+
+  nextButton: {
+    marginTop: 30,
+    borderRadius: 60,
+    height: 45,
+    backgroundColor: '#3557b7',
+    justifyContent: 'center',
+    minWidth: 300,
+    marginBottom: 100,
+  },
+  nextButtonText: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: '700',
+  },
+
 });

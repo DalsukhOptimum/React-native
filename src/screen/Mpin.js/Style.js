@@ -88,7 +88,7 @@ export const styles = StyleSheet.create({
     gap: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 23,
+    marginBottom: 23
   },
   icons: {
     width: 40,
@@ -122,16 +122,22 @@ export const styles = StyleSheet.create({
     marginLeft: 8,
     borderRadius: 6,
     backgroundColor: '#eee',
+    color:'grey'
+    
   },
   toggle: {
     width: 55,
     height: 55,
     lineHeight: 55,
     fontSize: 24,
-    textAlign: 'center',
+    textAlign: 'center'
   },
   focusCell: {
     borderColor: '#000',
+   
+  },
+  InnerDot:{
+  color:'grey'
   },
   nextButtonText: {
     textAlign: 'center',
