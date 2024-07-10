@@ -10,6 +10,7 @@ import {
 import React, {useState, useEffect} from 'react';
 import Loder from '../../component/Loder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PopUp from '../../component/PopUp';
 
 import {
   ALERT_TYPE,
@@ -62,6 +63,12 @@ export default function VerifyOTP({route, navigation}) {
   const [loader, setloader] = useState(false);
   const [Errors, SetErrors] = useState('');
   const [Submmited, setSubmmited] = useState(false);
+  const [popup, setpopup] = useState(false);
+  const [PopupData, setPopupData] = useState({
+    color: '',
+    Type: '',
+    Message: '',
+  });
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
@@ -69,7 +76,7 @@ export default function VerifyOTP({route, navigation}) {
   });
 
   useEffect(() => {
-    if (!value) {
+    if (value == '') {
       SetErrors('Please Enter Pin');
     } else if (!value.match('^[0-9]{4}$')) {
       SetErrors('only 4 Digit is valid');
@@ -122,11 +129,11 @@ export default function VerifyOTP({route, navigation}) {
     );
   };
 
+  ResendOTP = () => {
+    setloader(true);
 
-  ResendOTP = ()=>{
-
-   setloader(true);
-    fetch('http://localhost:3446/api/OTPController/GenerateOTP', {
+    console.log("this is email: ",Dataobj.Official_EmaildID)
+    fetch('http://192.168.1.29:8090/api/OTPController/GenerateOTP', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -138,21 +145,28 @@ export default function VerifyOTP({route, navigation}) {
     })
       .then(resp => resp.json())
       .then(async json => {
-        let value;
+
         if (json?.Code == '400') {
-          alert(json?.Message);
+        
+          setloader(false);
+          setpopupDataFunc('red', 'Error', json?.Message);
+          setpopup(true);
+
           setValue('');
           setSubmmited(false);
-        }
-        else if(json?.Code == '500')
-          {
-            alert("Something went wrong");
-          }
-        else {
-          alert("Otp Sended Successfully..");
+        } else if (json?.Code == '500') {
+     
+          setloader(false);
+          setpopupDataFunc('red', 'Error', "Something went wrong");
+          setpopup(true);
+        } else {
+       
+          setloader(false);
+          setpopupDataFunc('green', 'Success', "OTP sended successfully");
+          setpopup(true);
         }
 
-        setloader(false);
+       
         setSubmmited(false);
         setValue('');
       })
@@ -162,24 +176,23 @@ export default function VerifyOTP({route, navigation}) {
         setValue('');
       })
       .finally(() => {});
-
+  };
+  function setpopupDataFunc(color, Type, Message) {
+    setPopupData({color: color, Type: Type, Message: Message});
   }
 
   Submit = () => {
     Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
-      Toast.show({
-        type: ALERT_TYPE.DANGER,
-        title: 'Warning',
-        textBody:Errors,
-      })
+      setpopupDataFunc('blue', 'Warning', Errors);
+      setpopup(true);
       return;
     }
 
     setloader(true);
 
-    fetch('http://localhost:3446/api/OTPController/VerifyOTP', {
+    fetch('http://192.168.1.29:8090/api/OTPController/VerifyOTP', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -194,18 +207,15 @@ export default function VerifyOTP({route, navigation}) {
       .then(async json => {
         let Stoargevalue;
         if (json?.Code == '400') {
-          Dialog.show({
-            type: ALERT_TYPE.WARNING,
-            title: 'Error',
-            textBody:json?.Message ,
-            button: 'close',
-          
-          })
           setloader(false);
+          setpopupDataFunc('red', 'Error', json?.Message);
+          setpopup(true);
+
           setSubmmited(false);
           setValue('');
         } else if (json?.Code == '500') {
-          alert('something went wrong');
+          setpopupDataFunc('red', 'Error', 'something went wrong');
+          setpopup(true);
         } else {
           try {
             Stoargevalue = await AsyncStorage.getItem('@Data');
@@ -252,47 +262,59 @@ export default function VerifyOTP({route, navigation}) {
       .finally(() => {});
   };
 
+  function Ok() {
+    setpopup(false);
+  }
+
   return (
     <AlertNotificationRoot>
-    <SafeAreaView style={styles.root}>
-      <Loder Start={loader} />
-      <Text style={styles.title}>Verification</Text>
-      {/* <Image style={styles.icon} source={source} /> */}
-      <Text style={styles.subTitle}>
-        Please enter the verification code{'\n'}
-        we send to your email address
-      </Text>
+      <SafeAreaView style={styles.root}>
+        <Loder Start={loader} />
+        <PopUp
+          Start={popup}
+          Func={() => Ok()}
+          Message={PopupData.Message}
+          color={PopupData.color}
+          Type={PopupData.Type}
+        />
+        <Text style={styles.title}>Verification</Text>
+        {/* <Image style={styles.icon} source={source} /> */}
+        <Text style={styles.subTitle}>
+          Please enter the verification code{'\n'}
+          we send to your email address
+        </Text>
 
-      <CodeField
-        onSubmitEditing={event => {
-          Keyboard.dismiss();
-          Submit();
-        }}
-        ref={ref}
-        {...props}
-        value={value}
-        onChangeText={setValue}
-        cellCount={CELL_COUNT}
-        rootStyle={styles.codeFieldRoot}
-        keyboardType="number-pad"
-        textContentType="oneTimeCode"
-        renderCell={renderCell}
-      />
-      <View style={{marginTop: 10, marginLeft: 100}}>
-        <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
-      </View>
-      <View style={styles.nextButton}>
-        <Text onPress={() => Submit()} style={styles.nextButtonText}>
-          Verify
+        <CodeField
+          onSubmitEditing={event => {
+            Keyboard.dismiss();
+            Submit();
+          }}
+          ref={ref}
+          {...props}
+          value={value}
+          onChangeText={setValue}
+          cellCount={CELL_COUNT}
+          rootStyle={styles.codeFieldRoot}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          renderCell={renderCell}
+        />
+        <View style={{marginTop: 10, marginLeft: 100}}>
+          <Text style={{color: 'red'}}>
+            {Errors && Submmited ? Errors : ''}
+          </Text>
+        </View>
+        <View style={styles.nextButton}>
+          <Text onPress={() => Submit()} style={styles.nextButtonText}>
+            Verify
+          </Text>
+        </View>
+        <Text style={styles.footerText}>
+          <Text onPress={() => ResendOTP()} style={{color: 'blue'}}>
+            Resend OTP
+          </Text>
         </Text>
-      </View>
-      <Text style={styles.footerText}>
-        <Text onPress={() => ResendOTP()} style={{color:'blue'}}>
-   
-          Resend OTP
-        </Text>
-      </Text>
-    </SafeAreaView>
+      </SafeAreaView>
     </AlertNotificationRoot>
   );
 }

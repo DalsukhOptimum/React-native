@@ -19,6 +19,7 @@ import {
   AlertNotificationRoot,
   Toast,
 } from 'react-native-alert-notification';
+import {useFocusEffect, useNavigationState} from '@react-navigation/native';
 
 import {
   CodeField,
@@ -38,7 +39,28 @@ const Mpin = ({route, navigation}) => {
   const [Email, setEmail] = useState('');
   const [popup, setpopup] = useState(false);
   const PassesEmail = route.params?.Email;
-  const [state, setState] = useState();
+  const [PopupData, setPopupData] = useState({
+    color: '',
+    Type: '',
+    Message: '',
+  });
+
+  function setpopupDataFunc(color, Type, Message) {
+    setPopupData({color: color, Type: Type, Message: Message});
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (pin == '') {
+        SetErrors('Please Enter Pin');
+      } else if (!pin.match('^[0-9]{4}$')) {
+        SetErrors('only 4 Digit is valid');
+      } else {
+        SetErrors('');
+      }
+      console.log('this is Erors: ', Errors);
+    }, [pin]),
+  );
 
   const ref = useBlurOnFulfill({pin, cellCount: CELL_COUNT});
 
@@ -63,22 +85,6 @@ const Mpin = ({route, navigation}) => {
   };
 
   useEffect(() => {
- return  () => {
-      setState("")
-    };
-}, [navigation]);
-
-  useEffect(() => {
-    if (!pin) {
-      SetErrors('Please Enter Pin');
-    } else if (!pin.match('^[0-9]{4}$')) {
-      SetErrors('only 4 Digit is valid');
-    } else {
-      SetErrors('');
-    }
-  }, [pin]);
-
-  useEffect(() => {
     (async () => {
       try {
         const value = await AsyncStorage.getItem('@Data');
@@ -100,24 +106,34 @@ const Mpin = ({route, navigation}) => {
   console.log('This is Verify pin data: ', Email);
 
   LoginPgae = () => {
+    setpin('');
+    setloader(false);
+    setSubmmited(false);
+
     navigation.navigate('Home');
   };
 
   submit = async () => {
-    Keyboard.dismiss();
+    //Keyboard.dismiss();
+
     setSubmmited(true);
+
     if (Errors) {
-      Toast.show({
-        type: ALERT_TYPE.DANGER,
-        title: 'Warning',
-        textBody: Errors,
-      });
-       //setpopup(true);
+      //alert('Error hai');
+      // Toast.show({
+      //   type: ALERT_TYPE.DANGER,
+      //   title: 'Warning',
+      //   textBody: Errors,
+      // });
+      setpopupDataFunc('red', 'warning', Errors);
+      console.log('this is object ', PopupData);
+      setpopup(true);
       return;
     }
-    setloader(true);
 
-    fetch('http://localhost:3446/api/PINOperation/VerifyPin', {
+    setloader(true);
+    console.log('bahar aa gaya');
+    fetch('http://192.168.1.29:8090/api/PINOperation/VerifyPin', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -131,12 +147,20 @@ const Mpin = ({route, navigation}) => {
       .then(resp => resp.json())
       .then(async json => {
         if (json?.Code == '400') {
-          Dialog.show({
-            type: ALERT_TYPE.WARNING,
-            title: 'Error',
-            textBody: json?.Message,
-            button: 'close',
-          });
+          // Dialog.show({
+          //   type: ALERT_TYPE.WARNING,
+          //   title: 'Error',
+          //   textBody: json?.Message,
+          //   button: 'close',
+          // });
+          // alert("incorrect")
+          setpopupDataFunc('red', 'warning', json?.Message);
+          setpopup(true);
+          console.log('this is object ', PopupData);
+
+          setpin('');
+          setloader(false);
+          setSubmmited(false);
           // alert('PIn is incorrect');
         } else if (json?.Code == '200') {
           try {
@@ -148,16 +172,23 @@ const Mpin = ({route, navigation}) => {
           } catch (error) {
             console.log('error aaya ', error);
           }
-          // alert(json?.Message);
+
+          setpin('');
+          setloader(false);
+          setSubmmited(false);
+
+          // setpopupDataFunc('blue','success',"Pin is correct");
+          // setpopup(true);
+
           navigation.navigate('HRMS', {Data: json.ArrayOfResponse[0]});
         } else {
           alert('something went wrong');
+          setpin('');
+          setloader(false);
+          setSubmmited(false);
         }
 
         console.log(json);
-        setpin('');
-        setloader(false);
-        setSubmmited(false);
       })
       .catch(error => {
         setloader(false);
@@ -171,10 +202,16 @@ const Mpin = ({route, navigation}) => {
   }
 
   return (
-    <AlertNotificationRoot>
+  
       <SafeAreaView onclick={Keyboard.dismiss} style={styles.container}>
         <Loder Start={loader} />
-        {/* <PopUp Start={popup} Func={() => Ok()} Message={Errors} /> */}
+        <PopUp
+          Start={popup}
+          Func={() => Ok()}
+          Message={PopupData.Message}
+          color={PopupData.color}
+          Type={PopupData.Type}
+        />
         <Text style={styles.title}>Verify Pin </Text>
         <View style={styles.inputView}>
           <CodeField
@@ -207,7 +244,7 @@ const Mpin = ({route, navigation}) => {
           </Text>
         </View>
       </SafeAreaView>
-    </AlertNotificationRoot>
+   
   );
 };
 

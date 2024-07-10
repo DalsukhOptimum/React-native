@@ -11,6 +11,8 @@ import React, {useState, useEffect} from 'react';
 import {styles} from './Style';
 import Loder from '../../component/Loder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useFocusEffect} from '@react-navigation/native';
+import PopUp from '../../component/PopUp';
 
 import {
   CodeField,
@@ -33,26 +35,52 @@ export default function SetPin({route, navigation}) {
 
   const [click, setClick] = useState(false);
   const [username, setUsername] = useState('');
-  const [pin, setpin] = useState('');
+  const [Pin, setPin] = useState('');
   const [loader, setloader] = useState(false);
   const Employee_Code = route.params.Employee_Code;
   const Email = route.params.Email;
   const [Errors, SetErrors] = useState('');
   const [Submmited, setSubmmited] = useState(false);
+  const [popup, setpopup] = useState(false);
+  const [PopupData, setPopupData] = useState({
+    color: '',
+    Type: '',
+    Message: '',
+  });
 
-  const ref = useBlurOnFulfill({pin, cellCount: CELL_COUNT});
+  const ref = useBlurOnFulfill({Pin, cellCount: CELL_COUNT});
 
   console.log('set pin: ', Email);
 
-  useEffect(() => {
-    if (!pin) {
-      SetErrors('Please Enter Pin');
-    } else if (!pin.match('^[0-9]{4}$')) {
-      SetErrors('only 4 Digit is valid');
-    } else {
-      SetErrors('');
-    }
-  }, [pin]);
+  function setpopupDataFunc(color, Type, Message) {
+    setPopupData({color: color, Type: Type, Message: Message});
+  }
+
+  function Ok() {
+    setpopup(false);
+  }
+
+  // useFocusEffect(() => {
+  //   if (!Pin) {
+  //     SetErrors('Please Enter Pin');
+  //   } else if (!Pin.match('^[0-9]{4}$')) {
+  //     SetErrors('only 4 Digit is valid');
+  //   } else {
+  //     SetErrors('');
+  //   }
+  // }, [Pin]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!Pin) {
+        SetErrors('Please Enter Pin');
+      } else if (!Pin.match('^[0-9]{4}$')) {
+        SetErrors('only 4 Digit is valid');
+      } else {
+        SetErrors('');
+      }
+    }, [Pin]),
+  );
 
   const toggleMask = () => setEnableMask(f => !f);
   const renderCell = ({index, symbol, isFocused}) => {
@@ -78,33 +106,26 @@ export default function SetPin({route, navigation}) {
     Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
-      Toast.show({
-        type: ALERT_TYPE.DANGER,
-        title: 'Warning',
-        textBody:Errors,
-      })
+      setpopupDataFunc('red', 'Error', Errors);
+      setpopup(true);
       return;
     }
 
-    fetch('http://localhost:3446/api/PINOperation/GeneratePin', {
+    fetch('http://192.168.1.29:8090/api/PINOperation/GeneratePin', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({Employee_Code: Employee_Code, Pin: pin}),
+      body: JSON.stringify({Employee_Code: Employee_Code, Pin: Pin}),
     })
       .then(resp => resp.json())
       .then(async json => {
         if (json?.Code == '400' || json?.Code == '500') {
-          Toast.show({
-            type: ALERT_TYPE.DANGER,
-            title: 'Warning',
-            textBody:json?.Message,
-          })
+          setpopupDataFunc('red', 'Error', json?.Message);
+          setpopup(true);
         }
         if (json?.Code == '200') {
-          console.log('i am in set pin page: ');
           try {
             await AsyncStorage.clear();
             console.log('1 am in set pin page: ');
@@ -122,8 +143,6 @@ export default function SetPin({route, navigation}) {
             console.log('error aaya ', error);
           }
 
-          // alert(json?.Message);
-
           navigation.navigate('Mpin', {
             Email: json.ArrayOfResponse[0].Official_EmaildID,
           });
@@ -131,7 +150,7 @@ export default function SetPin({route, navigation}) {
 
         console.log(json);
         setloader(false);
-        setpin('');
+        setPin('');
         setSubmmited(false);
       })
       .catch(error => {
@@ -145,32 +164,37 @@ export default function SetPin({route, navigation}) {
 
   console.log('this is Employee Code: ', Employee_Code);
   return (
-    <AlertNotificationRoot>
-      <SafeAreaView style={styles.container}>
-        <Loder Start={loader} />
-        <Text style={styles.title}>Set Pin</Text>
-        <View style={styles.inputView}>
-          <CodeField
-            ref={ref}
-            onSubmitEditing={event => {
-              Keyboard.dismiss();
-              submit();
-            }}
-            value={pin}
-            onChangeText={setpin}
-            cellCount={CELL_COUNT}
-            keyboardType="number-pad"
-            textContentType="oneTimeCode"
-            renderCell={renderCell}
-          />
-        </View>
-        <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
-        <View style={styles.buttonView}>
-          <Pressable style={styles.button} onPress={() => submit()}>
-            <Text style={styles.buttonText}>SUBMIT</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
-    </AlertNotificationRoot>
+    <SafeAreaView style={styles.container}>
+      <Loder Start={loader} />
+      <PopUp
+        Start={popup}
+        Func={() => Ok()}
+        Message={PopupData.Message}
+        color={PopupData.color}
+        Type={PopupData.Type}
+      />
+      <Text style={styles.title}>Set Pin</Text>
+      <View style={styles.inputView}>
+        <CodeField
+          ref={ref}
+          onSubmitEditing={event => {
+            Keyboard.dismiss();
+            submit();
+          }}
+          value={Pin}
+          onChangeText={setPin}
+          cellCount={CELL_COUNT}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          renderCell={renderCell}
+        />
+      </View>
+      <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
+      <View style={styles.buttonView}>
+        <Pressable style={styles.button} onPress={() => submit()}>
+          <Text style={styles.buttonText}>SUBMIT</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
   );
 }

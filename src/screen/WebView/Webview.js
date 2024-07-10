@@ -123,7 +123,8 @@ const Webview = ({route, navigation}) => {
   );
 
   //let Base_Url=`https://localhost:4200/login/React?Data=${FinalData}`
-  let Base_Url = `http://192.168.1.12:8090?Data=${FinalData}`;
+  //let Base_Url = `http://192.168.1.12:8090?Data=${FinalData}`;
+  let Base_Url = `http://192.168.1.29:8080?Data=${FinalData}`;
   // let Base_Url=`https://192.168.1.24:4200/`
   console.log('final link ', Base_Url);
   return (

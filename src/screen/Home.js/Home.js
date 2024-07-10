@@ -9,6 +9,13 @@ import {
   Keyboard,
   useColorScheme,
 } from 'react-native';
+import PopUp from '../../component/PopUp';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from 'react-native-alert-notification';
 // import LOGOSVG from "../../assets/OptimumLogo.svg";
 // import {AsyncStorage} from '@react-native-async-storage/async-storage'
 import React, {useState, useEffect} from 'react';
@@ -16,15 +23,12 @@ import {styles} from './Style';
 import Loder from '../../component/Loder';
 import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useFocusEffect} from '@react-navigation/native';
+
 
 const logo = require('../../assets/logo1.png');
 
-import {
-  ALERT_TYPE,
-  Dialog,
-  AlertNotificationRoot,
-  Toast,
-} from 'react-native-alert-notification';
+
 
 const Home = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -33,6 +37,13 @@ const Home = ({navigation}) => {
   const [Role, setRole] = useState(0);
   const [isFocus, setIsFocus] = useState(false);
   const [Errors, setErrors] = useState({Email: '', Password: ''});
+  const [popup, setpopup] = useState(false);
+  const [PopupData, setPopupData] = useState({
+    color: '',
+    Type: '',
+    Message: '',
+  });
+  
 
   const [Submmited, setSubmmited] = useState(false);
   const colorScheme = useColorScheme();
@@ -41,6 +52,10 @@ const Home = ({navigation}) => {
     {label: 'Employee', value: '0'},
     {label: 'Admin', value: '1'},
   ];
+
+  function setpopupDataFunc(color, Type, Message) {
+    setPopupData({color: color, Type: Type, Message: Message});
+  }
 
   function validation(username, password) {
     let RecordError = Errors;
@@ -69,18 +84,16 @@ const Home = ({navigation}) => {
     validation(username, password);
 
     if (Errors.Email != '' || Errors.Password != '') {
-      Toast.show({
-        type: ALERT_TYPE.DANGER,
-        title: 'Warning',
-        textBody: "Please Enter Valid Details",
-      });
+     
+      setpopupDataFunc('red', 'warning', "Please Fill The valid Data");
+      setpopup(true);
 
       return;
     }
 
     setloader(true);
     console.log(username, password);
-    fetch('http://localhost:3446/api/Login/LoginHrms', {
+    fetch('http://192.168.1.29:8090/api/Login/LoginHrms', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -96,23 +109,21 @@ const Home = ({navigation}) => {
       .then(async json => {
         let value;
         if (json?.status == 'Error') {
-          Dialog.show({
-            type: ALERT_TYPE.DANGER,
-            title: 'Error',
-            textBody: 'Incorrect username or Password',
-            button: 'close',
-          });
+        
+          setloader(false);
+          setpopupDataFunc('red', 'Error', "Incorrect Username or Password");
+          setpopup(true);
           setPassword('');
           setUsername('');
           setErrors({Email: '', Password: ''});
 
-          setloader(false);
+      
 
           setSubmmited(false);
         }
         if (json?.status == 'success') {
           let Data = json?.ArrayOfResponse[0];
-          fetch('http://localhost:3446/api/OTPController/GenerateOTP', {
+          fetch('http://192.168.1.29:8090/api/OTPController/GenerateOTP', {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -131,25 +142,45 @@ const Home = ({navigation}) => {
                   title: 'Warning',
                   textBody: json?.Message,
                 });
+                setpopupDataFunc('red', 'Error', "Something went wrong");
+                 setpopup(true);
+                setPassword('');
+                setUsername('');
+                setErrors({Email: '', Password: ''});
+  
+                setloader(false);
+  
+                setSubmmited(false);
               } else if (json?.Code == '500') {
                 Toast.show({
-                  type: ALERT_TYPE.DANGER, 
+                  type: ALERT_TYPE.DANGER,
                   title: 'Warning',
                   textBody: json?.Message,
                 });
+                alert('something went wrong');
+                setPassword('');
+                setUsername('');
+                setErrors({Email: '', Password: ''});
+  
+                setloader(false);
+  
+                setSubmmited(false);
               } else {
+
+                setPassword('');
+                setUsername('');
+                setErrors({Email: '', Password: ''});
+  
+                setloader(false);
+  
+                setSubmmited(false);
+
                 navigation.navigate('VerifyOTP', {
                   Data: Data,
                 });
               }
 
-              setPassword('');
-              setUsername('');
-              setErrors({Email: '', Password: ''});
-
-              setloader(false);
-
-              setSubmmited(false);
+            
             })
             .catch(error => {
               setPassword('');
@@ -169,11 +200,21 @@ const Home = ({navigation}) => {
       .finally(() => {});
   }
 
+  function Ok() {
+    setpopup(false);
+  }
+
   return (
-    <AlertNotificationRoot>
+   
       <SafeAreaView style={styles.container}>
         <Loder Start={loader} />
-
+        <PopUp
+          Start={popup}
+          Func={() => Ok()}
+          Message={PopupData.Message}
+          color={PopupData.color}
+          Type={PopupData.Type}
+        />
         <Text style={styles.title}>HRMS</Text>
 
         <View style={styles.Form}>
@@ -250,7 +291,7 @@ const Home = ({navigation}) => {
           </View>
         </View>
       </SafeAreaView>
-    </AlertNotificationRoot>
+
   );
 };
 
