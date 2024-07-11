@@ -1,22 +1,21 @@
 import {View, Text, Modal, ActivityIndicator, Pressable} from 'react-native';
 import React, {useState} from 'react';
 
-const PopUp = ({Start, Func, Message,color, Type}) => {
-
+const PopUp = ({Start, Func, Message, color, Type}) => {
   return (
-    <Modal  animationType="slide" visible={Start} transparent={true}>
+    <Modal animationType="slide" visible={Start} transparent={true}>
       <View
-        // style={{
-        //   filter: 'blur(10)', 
-        //  backgroundColor:'rgba(0,0,0,0.6)',
-        //  height:'100%',
-        //  width:'100%'
-        // }}
-        >
+      // style={{
+      //   filter: 'blur(10)',
+      //  backgroundColor:'rgba(0,0,0,0.6)',
+      //  height:'100%',
+      //  width:'100%'
+      // }}
+      >
         <View
           style={{
             flex: 1.5,
-            opacity:1,
+            opacity: 1,
             backgroundColor: 'white',
             justifyContent: 'space-around',
             alignItems: 'center',
@@ -42,14 +41,14 @@ const PopUp = ({Start, Func, Message,color, Type}) => {
             style={{
               flex: 1,
               fontWeight: 'bold',
-              fontSize: 20,
+              // fontSize: 20,
               color: color,
-              fontSize: 25,
+              // fontSize: 25,
               justifyContent: 'flex-start',
               alignItems: 'center',
               fontSize: 35,
             }}>
-           {Type}
+            {Type}
           </Text>
 
           <Text

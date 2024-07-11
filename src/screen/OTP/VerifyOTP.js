@@ -78,10 +78,15 @@ export default function VerifyOTP({route, navigation}) {
   useEffect(() => {
     if (value == '') {
       SetErrors('Please Enter Pin');
+    } else if (!value.match('^[0-9]+$')) {
+      SetErrors('only Digit is valid');
     } else if (!value.match('^[0-9]{4}$')) {
-      SetErrors('only 4 Digit is valid');
+      SetErrors('Please Enter 4 digit');
     } else {
       SetErrors('');
+       setTimeout(() => {
+        Submit();
+       }, 100);
     }
   }, [value]);
 
@@ -132,7 +137,7 @@ export default function VerifyOTP({route, navigation}) {
   ResendOTP = () => {
     setloader(true);
 
-    console.log("this is email: ",Dataobj.Official_EmaildID)
+    console.log('this is email: ', Dataobj.Official_EmaildID);
     fetch('http://192.168.1.29:8090/api/OTPController/GenerateOTP', {
       method: 'POST',
       headers: {
@@ -145,28 +150,23 @@ export default function VerifyOTP({route, navigation}) {
     })
       .then(resp => resp.json())
       .then(async json => {
-
         if (json?.Code == '400') {
-        
           setloader(false);
-          setpopupDataFunc('red', 'Error', json?.Message);
+          setpopupDataFunc('rgb(247, 45, 45)', 'Error', json?.Message);
           setpopup(true);
 
           setValue('');
           setSubmmited(false);
         } else if (json?.Code == '500') {
-     
           setloader(false);
-          setpopupDataFunc('red', 'Error', "Something went wrong");
+          setpopupDataFunc('rgb(247, 45, 45)', 'Error', 'Something went wrong');
           setpopup(true);
         } else {
-       
           setloader(false);
-          setpopupDataFunc('green', 'Success', "OTP sended successfully");
+          setpopupDataFunc('green', 'Success', 'OTP sended successfully');
           setpopup(true);
         }
 
-       
         setSubmmited(false);
         setValue('');
       })
@@ -184,8 +184,9 @@ export default function VerifyOTP({route, navigation}) {
   Submit = () => {
     Keyboard.dismiss();
     setSubmmited(true);
+    console.log("Erros is: ",Errors);
     if (Errors) {
-      setpopupDataFunc('blue', 'Warning', Errors);
+      setpopupDataFunc('rgb(247, 45, 45)', 'Warning', Errors);
       setpopup(true);
       return;
     }
@@ -208,13 +209,13 @@ export default function VerifyOTP({route, navigation}) {
         let Stoargevalue;
         if (json?.Code == '400') {
           setloader(false);
-          setpopupDataFunc('red', 'Error', json?.Message);
+          setpopupDataFunc('rgb(247, 45, 45)', 'Incorrect', json?.Message);
           setpopup(true);
 
           setSubmmited(false);
           setValue('');
         } else if (json?.Code == '500') {
-          setpopupDataFunc('red', 'Error', 'something went wrong');
+          setpopupDataFunc('rgb(247, 45, 45)', 'Error', 'something went wrong');
           setpopup(true);
         } else {
           try {

@@ -51,12 +51,19 @@ const Mpin = ({route, navigation}) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      console.log('this is the pin in this: ', pin);
       if (pin == '') {
         SetErrors('Please Enter Pin');
+      } else if (!pin.match('^[0-9]+$')) {
+        SetErrors('only Digit is valid');
       } else if (!pin.match('^[0-9]{4}$')) {
-        SetErrors('only 4 Digit is valid');
+        SetErrors('Please Enter 4 digits');
       } else {
         SetErrors('');
+        setTimeout(() => {
+          submit();
+        }, 5);
+       
       }
       console.log('this is Erors: ', Errors);
     }, [pin]),
@@ -88,13 +95,11 @@ const Mpin = ({route, navigation}) => {
     (async () => {
       try {
         const value = await AsyncStorage.getItem('@Data');
-        console.log('i am printing the values: ', value);
+
         if (value !== null) {
           let data = await JSON.parse(value);
-          console.log('this is final data object: ', data);
-          setEmail(data.Official_EmaildID);
 
-          console.log('this is Email ', Email);
+          setEmail(data.Official_EmaildID);
         }
       } catch (error) {
         console.log('i am in catch block ', error);
@@ -114,19 +119,12 @@ const Mpin = ({route, navigation}) => {
   };
 
   submit = async () => {
-    //Keyboard.dismiss();
-
+  
     setSubmmited(true);
-
+    
     if (Errors) {
-      //alert('Error hai');
-      // Toast.show({
-      //   type: ALERT_TYPE.DANGER,
-      //   title: 'Warning',
-      //   textBody: Errors,
-      // });
-      setpopupDataFunc('red', 'warning', Errors);
-      console.log('this is object ', PopupData);
+      console.log('this is pin: in submit: ', pin);
+      setpopupDataFunc('rgb(247, 45, 45)', 'warning', Errors);
       setpopup(true);
       return;
     }
@@ -147,14 +145,7 @@ const Mpin = ({route, navigation}) => {
       .then(resp => resp.json())
       .then(async json => {
         if (json?.Code == '400') {
-          // Dialog.show({
-          //   type: ALERT_TYPE.WARNING,
-          //   title: 'Error',
-          //   textBody: json?.Message,
-          //   button: 'close',
-          // });
-          // alert("incorrect")
-          setpopupDataFunc('red', 'warning', json?.Message);
+          setpopupDataFunc('rgb(247, 45, 45)', 'Login Failed', 'Incorrect Pin');
           setpopup(true);
           console.log('this is object ', PopupData);
 
@@ -177,14 +168,17 @@ const Mpin = ({route, navigation}) => {
           setloader(false);
           setSubmmited(false);
 
-          // setpopupDataFunc('blue','success',"Pin is correct");
-          // setpopup(true);
-
           navigation.navigate('HRMS', {Data: json.ArrayOfResponse[0]});
         } else {
           alert('something went wrong');
           setpin('');
           setloader(false);
+          setpopupDataFunc(
+            'rgb(247, 45, 45)',
+            'Something went wrong',
+            'Incorrect Pin',
+          );
+          setpopup(true);
           setSubmmited(false);
         }
 
@@ -202,49 +196,47 @@ const Mpin = ({route, navigation}) => {
   }
 
   return (
-  
-      <SafeAreaView onclick={Keyboard.dismiss} style={styles.container}>
-        <Loder Start={loader} />
-        <PopUp
-          Start={popup}
-          Func={() => Ok()}
-          Message={PopupData.Message}
-          color={PopupData.color}
-          Type={PopupData.Type}
+    <SafeAreaView onclick={Keyboard.dismiss} style={styles.container}>
+      <Loder Start={loader} />
+      <PopUp
+        Start={popup}
+        Func={() => Ok()}
+        Message={PopupData.Message}
+        color={PopupData.color}
+        Type={PopupData.Type}
+      />
+      <Text style={styles.title}>Verify Pin </Text>
+      <View style={styles.inputView}>
+        <CodeField
+          onSubmitEditing={event => {
+            Keyboard.dismiss();
+            submit();
+          }}
+          ref={ref}
+          value={pin}
+          onChangeText={setpin}
+          cellCount={CELL_COUNT}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          renderCell={renderCell}
+          textInputStyle={styles.InnerDot}
         />
-        <Text style={styles.title}>Verify Pin </Text>
-        <View style={styles.inputView}>
-          <CodeField
-            onSubmitEditing={event => {
-              Keyboard.dismiss();
-              submit();
-            }}
-            ref={ref}
-            value={pin}
-            onChangeText={setpin}
-            cellCount={CELL_COUNT}
-            keyboardType="number-pad"
-            textContentType="oneTimeCode"
-            renderCell={renderCell}
-            textInputStyle={styles.InnerDot}
-          />
-        </View>
-        <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
+      </View>
+      <Text style={{color: 'red'}}>{Errors && Submmited ? Errors : ''}</Text>
 
-        <View style={styles.buttonView}>
-          <Pressable style={styles.button} onPress={() => submit()}>
-            <Text style={styles.buttonText}>LOGIN</Text>
-          </Pressable>
-          <Text style={styles.footerText}>
-            Forget Pin?
-            <Text onPress={() => LoginPgae()} style={styles.signup}>
-              {' '}
-              Set Up Pin
-            </Text>
+      <View style={styles.buttonView}>
+        <Pressable style={styles.button} onPress={() => submit()}>
+          <Text style={styles.buttonText}>LOGIN</Text>
+        </Pressable>
+        <Text style={styles.footerText}>
+          Forget Pin?
+          <Text onPress={() => LoginPgae()} style={styles.signup}>
+            {' '}
+            Set Up Pin
           </Text>
-        </View>
-      </SafeAreaView>
-   
+        </Text>
+      </View>
+    </SafeAreaView>
   );
 };
 
