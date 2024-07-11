@@ -25,10 +25,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
 
-
 const logo = require('../../assets/logo1.png');
-
-
 
 const Home = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -43,10 +40,9 @@ const Home = ({navigation}) => {
     Type: '',
     Message: '',
   });
-  
 
   const [Submmited, setSubmmited] = useState(false);
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
 
   const data = [
     {label: 'Employee', value: '0'},
@@ -84,8 +80,7 @@ const Home = ({navigation}) => {
     validation(username, password);
 
     if (Errors.Email != '' || Errors.Password != '') {
-     
-      setpopupDataFunc('red', 'warning', "Please Fill The valid Data");
+      setpopupDataFunc('rgb(247, 45, 45)', 'warning', 'Please Fill The valid Data');
       setpopup(true);
 
       return;
@@ -109,15 +104,12 @@ const Home = ({navigation}) => {
       .then(async json => {
         let value;
         if (json?.status == 'Error') {
-        
           setloader(false);
-          setpopupDataFunc('red', 'Error', "Incorrect Username or Password");
+          setpopupDataFunc('rgb(247, 45, 45)', 'Login Failed', 'Incorrect Username or Password');
           setpopup(true);
           setPassword('');
           setUsername('');
           setErrors({Email: '', Password: ''});
-
-      
 
           setSubmmited(false);
         }
@@ -137,50 +129,42 @@ const Home = ({navigation}) => {
             .then(async json => {
               let value;
               if (json?.Code == '400') {
-                Toast.show({
-                  type: ALERT_TYPE.DANGER,
-                  title: 'Warning',
-                  textBody: json?.Message,
-                });
-                setpopupDataFunc('red', 'Error', "Something went wrong");
-                 setpopup(true);
+              
+                setpopupDataFunc('rgb(247, 45, 45)', 'Error', 'Something went wrong');
+                setpopup(true);
                 setPassword('');
                 setUsername('');
                 setErrors({Email: '', Password: ''});
-  
+
                 setloader(false);
-  
+
                 setSubmmited(false);
               } else if (json?.Code == '500') {
-                Toast.show({
-                  type: ALERT_TYPE.DANGER,
-                  title: 'Warning',
-                  textBody: json?.Message,
-                });
-                alert('something went wrong');
+                setloader(false);
                 setPassword('');
                 setUsername('');
+                setpopupDataFunc('rgb(247, 45, 45)', 'Error', 'Something went wrong');
+                setpopup(true);
+
+               
                 setErrors({Email: '', Password: ''});
-  
-                setloader(false);
-  
+
+               
+
                 setSubmmited(false);
               } else {
-
                 setPassword('');
                 setUsername('');
                 setErrors({Email: '', Password: ''});
-  
+
                 setloader(false);
-  
+
                 setSubmmited(false);
 
                 navigation.navigate('VerifyOTP', {
                   Data: Data,
                 });
               }
-
-            
             })
             .catch(error => {
               setPassword('');
@@ -205,93 +189,89 @@ const Home = ({navigation}) => {
   }
 
   return (
-   
-      <SafeAreaView style={styles.container}>
-        <Loder Start={loader} />
-        <PopUp
-          Start={popup}
-          Func={() => Ok()}
-          Message={PopupData.Message}
-          color={PopupData.color}
-          Type={PopupData.Type}
-        />
-        <Text style={styles.title}>HRMS</Text>
+    <SafeAreaView style={styles.container}>
+      <Loder Start={loader} />
+      <PopUp
+        Start={popup}
+        Func={() => Ok()}
+        Message={PopupData.Message}
+        color={PopupData.color}
+        Type={PopupData.Type}
+      />
+      <Text style={styles.title}>HRMS</Text>
 
-        <View style={styles.Form}>
-          {/* <Image source={logo} style={styles.image} resizeMode='contain' />   */}
-          <View style={styles.placeholderStyle}>
-            <Dropdown
-              style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              itemContainerStyle={styles.ContainerStyle}
-              itemTextStyle={styles.ItemStyle}
-              data={data}
-              search
-              maxHeight={300}
-              labelField="label"
-              valueField="Role"
-              placeholder={
-                !isFocus ? (Role == 0 ? 'Employee' : 'Admin') : '...'
-              }
-              searchPlaceholder="Search..."
-              value={Role}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={item => {
-                setRole(item.value);
-                setIsFocus(false);
+      <View style={styles.Form}>
+        {/* <Image source={logo} style={styles.image} resizeMode='contain' />   */}
+        <View style={styles.placeholderStyle}>
+          <Dropdown
+            style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            itemContainerStyle={styles.ContainerStyle}
+            itemTextStyle={styles.ItemStyle}
+            data={data}
+            search
+            maxHeight={300}
+            labelField="label"
+            valueField="Role"
+            placeholder={!isFocus ? (Role == 0 ? 'Employee' : 'Admin') : '...'}
+            searchPlaceholder="Search..."
+            value={Role}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={item => {
+              setRole(item.value);
+              setIsFocus(false);
+            }}
+          />
+
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor="black"
+              placeholder="EMAIL"
+              value={username}
+              onChangeText={value => {
+                setUsername(value);
+                validation(value, password);
               }}
+              autoCorrect={false}
+              autoCapitalize="none"
             />
-
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <TextInput
-                style={styles.input}
-                placeholderTextColor="black"
-                placeholder="EMAIL"
-                value={username}
-                onChangeText={value => {
-                  setUsername(value);
-                  validation(value, password);
-                }}
-                autoCorrect={false}
-                autoCapitalize="none"
-              />
-            </TouchableWithoutFeedback>
-            <Text style={{color: 'red'}}>
-              {Errors.Email && Submmited ? Errors.Email : ''}
-            </Text>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <TextInput
-                style={styles.input}
-                placeholderTextColor="black"
-                placeholder="Password"
-                secureTextEntry
-                value={password}
-                onChangeText={value => {
-                  setPassword(value);
-                  validation(username, value);
-                }}
-                autoCorrect={false}
-                autoCapitalize="none"
-              />
-            </TouchableWithoutFeedback>
-            <Text style={{color: 'red'}}>
-              {Errors.Password && Submmited ? Errors.Password : ''}
-            </Text>
-          </View>
-          <View style={styles.rememberView}></View>
-
-          <View style={styles.placeholderStyle}>
-            <Pressable style={styles.nextButton} onPress={() => submit()}>
-              <Text style={styles.nextButtonText}>LOGIN</Text>
-            </Pressable>
-          </View>
+          </TouchableWithoutFeedback>
+          <Text style={{color: 'red'}}>
+            {Errors.Email && Submmited ? Errors.Email : ''}
+          </Text>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor="black"
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={value => {
+                setPassword(value);
+                validation(username, value);
+              }}
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+          </TouchableWithoutFeedback>
+          <Text style={{color: 'red'}}>
+            {Errors.Password && Submmited ? Errors.Password : ''}
+          </Text>
         </View>
-      </SafeAreaView>
+        <View style={styles.rememberView}></View>
 
+        <View style={styles.placeholderStyle}>
+          <Pressable style={styles.nextButton} onPress={() => submit()}>
+            <Text style={styles.nextButtonText}>LOGIN</Text>
+          </Pressable>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

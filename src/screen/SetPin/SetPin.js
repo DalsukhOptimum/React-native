@@ -33,8 +33,6 @@ const CELL_COUNT = 4;
 export default function SetPin({route, navigation}) {
   const [enableMask, setEnableMask] = useState(true);
 
-  const [click, setClick] = useState(false);
-  const [username, setUsername] = useState('');
   const [Pin, setPin] = useState('');
   const [loader, setloader] = useState(false);
   const Employee_Code = route.params.Employee_Code;
@@ -60,24 +58,19 @@ export default function SetPin({route, navigation}) {
     setpopup(false);
   }
 
-  // useFocusEffect(() => {
-  //   if (!Pin) {
-  //     SetErrors('Please Enter Pin');
-  //   } else if (!Pin.match('^[0-9]{4}$')) {
-  //     SetErrors('only 4 Digit is valid');
-  //   } else {
-  //     SetErrors('');
-  //   }
-  // }, [Pin]);
-
   useFocusEffect(
     React.useCallback(() => {
       if (!Pin) {
         SetErrors('Please Enter Pin');
+      } else if (!Pin.match('^[0-9]+$')) {
+        SetErrors('only Digit is valid');
       } else if (!Pin.match('^[0-9]{4}$')) {
-        SetErrors('only 4 Digit is valid');
+        SetErrors('please Enter 4 digit');
       } else {
         SetErrors('');
+        setTimeout(() => {
+          submit();
+        }, 5);
       }
     }, [Pin]),
   );
@@ -103,13 +96,15 @@ export default function SetPin({route, navigation}) {
   };
 
   submit = () => {
+    console.log("Idhar aaya subit me: ",Errors," Submitetd: ",Submmited);
     Keyboard.dismiss();
     setSubmmited(true);
     if (Errors) {
-      setpopupDataFunc('red', 'Error', Errors);
+      setpopupDataFunc('rgb(247, 45, 45)', 'Warning', Errors);
       setpopup(true);
       return;
     }
+    setloader(true);
 
     fetch('http://192.168.1.29:8090/api/PINOperation/GeneratePin', {
       method: 'POST',
@@ -122,43 +117,47 @@ export default function SetPin({route, navigation}) {
       .then(resp => resp.json())
       .then(async json => {
         if (json?.Code == '400' || json?.Code == '500') {
-          setpopupDataFunc('red', 'Error', json?.Message);
-          setpopup(true);
+          setpopup(false);
+          setpopupDataFunc('rgb(247, 45, 45)', 'Error', json?.Message);
+
+          setloader(false);
+          setPin('');
+          setSubmmited(false);
         }
         if (json?.Code == '200') {
           try {
             await AsyncStorage.clear();
-            console.log('1 am in set pin page: ');
-            console.log(
-              'this is data ',
-              JSON.stringify(json.ArrayOfResponse[0]),
-            );
-            console.log('2 am in set pin page: ');
             await AsyncStorage.setItem(
               '@Data',
               JSON.stringify(json.ArrayOfResponse[0]),
             );
-            console.log('3 am in set pin page: ');
           } catch (error) {
             console.log('error aaya ', error);
           }
 
-          navigation.navigate('Mpin', {
-            Email: json.ArrayOfResponse[0].Official_EmaildID,
-          });
+          
+
+          setTimeout(() => {
+            setPin('');
+            setSubmmited(false);
+            setloader(false);
+            navigation.navigate('Mpin', {
+              Email: json.ArrayOfResponse[0].Official_EmaildID,
+            });
+          }, 2000);
         }
 
         console.log(json);
-        setloader(false);
-        setPin('');
-        setSubmmited(false);
       })
       .catch(error => {
         setloader(false);
+        setPin('');
+        setSubmmited(false);
         console.error(error);
       })
       .finally(() => {
-        setloader(false);
+        setPin('');
+        setSubmmited(false);
       });
   };
 
