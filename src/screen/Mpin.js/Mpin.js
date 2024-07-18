@@ -13,13 +13,13 @@ import {styles} from './Style';
 import Loder from '../../component/Loder';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PopUp from '../../component/PopUp';
+import TouchID from 'react-native-touch-id';
+
 import {
-  ALERT_TYPE,
-  Dialog,
-  AlertNotificationRoot,
-  Toast,
-} from 'react-native-alert-notification';
-import {useFocusEffect, useNavigationState} from '@react-navigation/native';
+  useFocusEffect,
+  useNavigationState,
+  useIsFocused,
+} from '@react-navigation/native';
 
 import {
   CodeField,
@@ -30,6 +30,77 @@ import {
 const CELL_COUNT = 4;
 
 const Mpin = ({route, navigation}) => {
+  const [biometryType, setBiometryType] = useState('');
+  const [optionalConfigObject, setoptionalConfigObject] = useState('');
+  const [Data, setData] = useState('');
+  const isFocused = useIsFocused();
+  const [Count, setCount] = useState(0);
+
+  useEffect(() => {
+    setData({
+      title: 'HRMS_React_Native',
+      imageColor: '#B69377', // Android
+      imageErrorColor: '#B69377', // Android
+      sensorDescription: 'Touch sensor', // Android
+      sensorErrorDescription: 'Failed', // Android
+      cancelText: 'Cancel', // Android
+      fallbackLabel: 'Show Passcode', // iOS (if empty, then label is hidden)
+      unifiedErrors: false, // use unified error messages (default false)
+      passcodeFallback: true, // iOS: allows the device to fall back to using the passcode if faceid or touch is not available. This does not mean that if touchid or faceid fails the first few times, it will revert to a passcode; rather, if the former are not enrolled, then it will use the passcode.
+    });
+
+    TouchID.isSupported(optionalConfigObject)
+      .then(biometryType => {
+        console.log(biometryType);
+
+        // Success code
+        if (biometryType === 'FaceID') {
+          console.log('Hello from Face');
+          setBiometryType('FaceID');
+        } else {
+          console.log('Hello FingerPrint');
+          setBiometryType('TouchID');
+        }
+      })
+      .catch(error => {
+        // Failure code
+        console.log(error);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (biometryType === 'FaceID' || biometryType === 'TouchID') {
+      !PassesEmail ? authenticate() : console.log('Pehli bar nai hai');
+    }
+  }, [biometryType]);
+
+  const authenticate = () => {
+    TouchID.authenticate(
+      'HRMS Require FingerPrint for Verification ',
+      optionalConfigObject,
+    )
+      .then(async success => {
+        if (success) {
+          console.log('how it is');
+          console.log(success);
+          try {
+            const value = await AsyncStorage.getItem('@Data');
+
+            if (value !== null) {
+              let data = await JSON.parse(value);
+              setData(data);
+            }
+          } catch (error) {
+            console.log('i am in catch block ', error);
+          }
+          setTimeout(() => {
+            navigation.navigate('HRMS', {Data: Data}); /// login with logic
+          }, 100);
+        }
+      })
+      .catch(error => {});
+  };
+
   const [enableMask, setEnableMask] = useState(true);
 
   const [loader, setloader] = useState(false);
@@ -63,7 +134,6 @@ const Mpin = ({route, navigation}) => {
         setTimeout(() => {
           submit();
         }, 5);
-       
       }
       console.log('this is Erors: ', Errors);
     }, [pin]),
@@ -119,9 +189,8 @@ const Mpin = ({route, navigation}) => {
   };
 
   submit = async () => {
-  
     setSubmmited(true);
-    
+
     if (Errors) {
       console.log('this is pin: in submit: ', pin);
       setpopupDataFunc('rgb(247, 45, 45)', 'warning', Errors);
@@ -233,6 +302,18 @@ const Mpin = ({route, navigation}) => {
           <Text onPress={() => LoginPgae()} style={styles.signup}>
             {' '}
             Set Up Pin
+          </Text>
+        </Text>
+        <Text style={styles.AnotherText}>
+          <Text
+            onPress={() => {
+              if (biometryType === 'FaceID' || biometryType === 'TouchID') {
+                authenticate();
+              }
+            }}
+            style={styles.AnotherTextDesign}>
+            {' '}
+            Use Biometric
           </Text>
         </Text>
       </View>

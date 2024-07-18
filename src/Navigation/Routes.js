@@ -6,6 +6,7 @@ import Home from '../screen/Home.js/Home';
 import Webview from '../screen/WebView/Webview';
 import SetPin from '../screen/SetPin/SetPin';
 import VerifyOTP from '../screen/OTP/VerifyOTP';
+import FingerPrint from '../screen/FingerPrint/FingerPrint';
 
 const Stack = createStackNavigator();
 
@@ -20,9 +21,10 @@ const Routes = (stack, Flag) => {
             component={Home}
             options={{headerShown: false}}
           />
-          <Stack.Screen name="HRMS" component={Webview}/>
+          <Stack.Screen name="HRMS" component={Webview} />
           <Stack.Screen name="SetPin" component={SetPin} />
           <Stack.Screen name="VerifyOTP" component={VerifyOTP} />
+          <Stack.Screen name="FingerPrint" component={FingerPrint} />
         </>
       ) : (
         <>
@@ -32,9 +34,10 @@ const Routes = (stack, Flag) => {
             options={{headerShown: false}}
           />
           <Stack.Screen name="Mpin" component={Mpin} />
-          <Stack.Screen name="HRMS" component={Webview}    />
+          <Stack.Screen name="HRMS" component={Webview} />
           <Stack.Screen name="SetPin" component={SetPin} />
           <Stack.Screen name="VerifyOTP" component={VerifyOTP} />
+          <Stack.Screen name="FingerPrint" component={FingerPrint} />
         </>
       )}
     </>

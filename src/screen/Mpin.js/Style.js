@@ -100,6 +100,16 @@ export const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 15,
   },
+  AnotherText:{
+    textAlign: 'center',
+    color: 'gray',
+    marginTop: 50,
+    fontSize: 15,
+  },
+  AnotherTextDesign:{
+    color: 'green',
+    fontSize: 20,
+  },
   signup: {
     color: 'red',
     fontSize: 13,
