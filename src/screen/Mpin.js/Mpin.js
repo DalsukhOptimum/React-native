@@ -310,6 +310,9 @@ const Mpin = ({route, navigation}) => {
               if (biometryType === 'FaceID' || biometryType === 'TouchID') {
                 authenticate();
               }
+              else{
+                alert("No Face or fingerPrint");
+              }
             }}
             style={styles.AnotherTextDesign}>
             {' '}
