@@ -138,14 +138,14 @@ export default function VerifyOTP({route, navigation}) {
     setloader(true);
 
     console.log('this is email: ', Dataobj.Official_EmaildID);
-    fetch('http://192.168.1.29:8090/api/OTPController/GenerateOTP', {
+    fetch('http://62.171.164.201:8088/api/OTPController/GenerateOTP', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        Official_EmaildID: Dataobj.Official_EmaildID,
+        Official_EmaildID: (Dataobj.Official_EmaildID == 'admin@optimumfintech.co.in')?'santosh.n@optimumfintech.com':Dataobj.Official_EmaildID,
       }),
     })
       .then(resp => resp.json())
@@ -193,14 +193,14 @@ export default function VerifyOTP({route, navigation}) {
 
     setloader(true);
 
-    fetch('http://192.168.1.29:8090/api/OTPController/VerifyOTP', {
+    fetch('http://62.171.164.201:8088/api/OTPController/VerifyOTP', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        Official_EmaildID: Dataobj.Official_EmaildID,
+        Official_EmaildID: (Dataobj.Official_EmaildID == 'admin@optimumfintech.co.in')?'santosh.n@optimumfintech.com':Dataobj.Official_EmaildID,
         OTP: value,
       }),
     })

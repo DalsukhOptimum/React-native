@@ -88,7 +88,7 @@ const Home = ({navigation}) => {
 
     setloader(true);
     console.log(username, password);
-    fetch('http://192.168.1.29:8090/api/Login/LoginHrms', {
+    fetch('http://62.171.164.201:8088/api/Login/LoginHrms', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -115,14 +115,14 @@ const Home = ({navigation}) => {
         }
         if (json?.status == 'success') {
           let Data = json?.ArrayOfResponse[0];
-          fetch('http://192.168.1.29:8090/api/OTPController/GenerateOTP', {
+          fetch('http://62.171.164.201:8088/api/OTPController/GenerateOTP', {
             method: 'POST',
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              Official_EmaildID: json?.ArrayOfResponse[0].Official_EmaildID,
+              Official_EmaildID: ((json?.ArrayOfResponse[0].Official_EmaildID) =='admin@optimumfintech.co.in')?'santosh.n@optimumfintech.com':json?.ArrayOfResponse[0].Official_EmaildID,
             }),
           })
             .then(resp => resp.json())

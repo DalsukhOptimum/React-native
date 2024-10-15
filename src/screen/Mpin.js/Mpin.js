@@ -200,7 +200,7 @@ const Mpin = ({route, navigation}) => {
 
     setloader(true);
     console.log('bahar aa gaya');
-    fetch('http://192.168.1.29:8090/api/PINOperation/VerifyPin', {
+    fetch('http://62.171.164.201:8088/api/PINOperation/VerifyPin', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
